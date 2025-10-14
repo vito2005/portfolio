@@ -1,0 +1,31 @@
+<template>
+  <div class="min-h-screen flex flex-col">
+    <header class="border-b shadow-sm bg-white">
+      <nav class="container mx-auto flex items-center justify-between p-4">
+        <NuxtLink to="/" class="text-xl font-semibold">A.B.</NuxtLink>
+        <ul class="flex gap-4">
+          <li>
+            <NuxtLink to="/about" class="hover:shadow-sm rounded-md p-2"
+              >About</NuxtLink
+            >
+          </li>
+          <li>
+            <NuxtLink to="/products" class="btn">Products</NuxtLink>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="flex-1 container mx-auto p-4">
+      <slot />
+    </main>
+    <footer class="border-t">
+      <p class="p-4 text-sm text-gray-500">Copyright {{ year }}</p>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+const year = new Date().getFullYear();
+</script>
+
+<style scoped></style>
