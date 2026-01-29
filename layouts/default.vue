@@ -9,11 +9,11 @@ const year = new Date().getFullYear();
       <nav class="container mx-auto flex items-center justify-between p-4">
         <NuxtLink to="/" class="text-xl font-semibold">A.B.</NuxtLink>
         <ul class="flex gap-4">
-          <li>
+          <!-- <li>
             <NuxtLink to="/about" class="hover:shadow-sm rounded-md p-2"
               >About</NuxtLink
             >
-          </li>
+          </li> -->
           <li>
             <NuxtLink to="/lessons" class="btn">Lessons</NuxtLink>
           </li>
