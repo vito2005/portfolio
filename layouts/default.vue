@@ -1,3 +1,8 @@
+
+<script setup>
+const year = new Date().getFullYear();
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <header class="border-b shadow-sm bg-white">
@@ -10,7 +15,7 @@
             >
           </li>
           <li>
-            <NuxtLink to="/products" class="btn">Products</NuxtLink>
+            <NuxtLink to="/lessons" class="btn">Lessons</NuxtLink>
           </li>
         </ul>
       </nav>
@@ -24,8 +29,4 @@
   </div>
 </template>
 
-<script setup>
-const year = new Date().getFullYear();
-</script>
 
-<style scoped></style>
