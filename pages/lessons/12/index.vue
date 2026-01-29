@@ -34,6 +34,7 @@ const fonts = {
 }
 
 const parameters = {
+  text: 'Alex Buki',
   fontSize: 0.5,
   fontType: 'Sora'
 }
@@ -62,7 +63,7 @@ onMounted(() => {
     const selectedFont = fonts[parameters.fontType]
     if (!selectedFont) return
 
-    const textGeometry = new TextGeometry('Alex Buki', {
+    const textGeometry = new TextGeometry(parameters.text, {
       font: selectedFont,
       size: parameters.fontSize,
       depth: 0.2,
@@ -98,6 +99,10 @@ onMounted(() => {
       }
     }
   )
+
+  gui.add(parameters, 'text')
+    .name('Text')
+    .onChange(updateText)
 
   gui.add(parameters, 'fontSize')
     .min(0.1)
