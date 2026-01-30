@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     currencyKey: process.env.CURRENCY_API_KEY
   },
   nitro: {
+    preset: 'cloudflare-pages',
     prerender: {
       autoSubfolderIndex: false
     }
