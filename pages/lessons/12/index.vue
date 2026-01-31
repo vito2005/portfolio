@@ -8,7 +8,6 @@
 import { ref, onMounted } from 'vue'
 import * as THREE from 'three'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import GUI from 'lil-gui'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
 
 definePageMeta({
@@ -23,7 +22,6 @@ useHead({
 const canvasRef = ref(null)
 const containerRef = ref(null)
 
-let gui
 let animationId
 let textMesh
 let material
@@ -36,23 +34,35 @@ const fonts = {
 const parameters = {
   text: 'Alex Buki',
   fontSize: 0.5,
-  fontType: 'Sora'
+  fontType: 'Sora',
+  matcapTexture: 8
 }
 
 onMounted(() => {
   if (!canvasRef.value) return
 
-  const lessonData = useLesson(canvasRef)
-  const { camera, scene, textureLoader, fontLoader, controls, renderer } = lessonData
+  const lessonData = useLesson(canvasRef, containerRef)
+  const { camera, scene, textureLoader, fontLoader, controls, renderer, gui } = lessonData
 
-  gui = new GUI({container: containerRef.value})
   gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
+    gui.domElement.style.top = '0'
+    gui.domElement.style.right = '0'
 
-  const matcapTexture = textureLoader.load('/textures/matcaps/8.png')
-  matcapTexture.colorSpace = THREE.SRGBColorSpace
-  material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture })
+  const matcapTextures = [
+    textureLoader.load('/textures/matcaps/1.png'),
+    textureLoader.load('/textures/matcaps/2.png'),
+    textureLoader.load('/textures/matcaps/3.png'),
+    textureLoader.load('/textures/matcaps/4.png'),
+    textureLoader.load('/textures/matcaps/5.png'),
+    textureLoader.load('/textures/matcaps/6.png'),
+    textureLoader.load('/textures/matcaps/7.png'),
+    textureLoader.load('/textures/matcaps/8.png'),
+
+  ]
+  matcapTextures.forEach(texture => {
+    texture.colorSpace = THREE.SRGBColorSpace
+  })
+  material = new THREE.MeshMatcapMaterial({ matcap: matcapTextures[7] })
 
   const updateText = () => {
     if (textMesh) {
@@ -103,6 +113,12 @@ onMounted(() => {
   gui.add(parameters, 'text')
     .name('Text')
     .onChange(updateText)
+
+  gui.add(parameters, 'matcapTexture', matcapTextures.map((_, index) => index + 1))
+    .name('Matcap Texture')
+    .onChange((value) => {
+      material.matcap = matcapTextures[value - 1]
+    })
 
   gui.add(parameters, 'fontSize')
     .min(0.1)

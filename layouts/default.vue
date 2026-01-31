@@ -5,8 +5,8 @@ const year = new Date().getFullYear();
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <header class="border-b shadow-sm bg-white">
-      <nav class="container mx-auto flex items-center justify-between p-4">
+    <header class="border-b shadow-sm bg-white max-h-[75px]">
+      <nav class="container mx-auto flex items-center justify-between p-4 py-6 ">
         <NuxtLink to="/" class="text-xl font-semibold">A.B.</NuxtLink>
         <ul class="flex gap-4">
           <!-- <li>
