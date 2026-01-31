@@ -1,4 +1,3 @@
-
 <script setup>
 const year = new Date().getFullYear();
 </script>
@@ -28,5 +27,3 @@ const year = new Date().getFullYear();
     </footer>
   </div>
 </template>
-
-

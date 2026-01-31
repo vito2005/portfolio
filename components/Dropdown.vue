@@ -1,46 +1,24 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div ref="dropdownRef" class="relative">
     <button
       class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
-      @click="toggleDropdown"
-    >
+      @click="toggleDropdown">
       <span>{{ displayText }}</span>
-      <svg
-        class="w-4 h-4 transition-transform"
-        :class="{ 'rotate-180': isDropdownOpen }"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M19 9l-7 7-7-7"
-        />
+      <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpen }" fill="none"
+        stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
       </svg>
     </button>
-    <transition
-      enter-active-class="transition ease-out duration-100"
-      enter-from-class="transform opacity-0 scale-95"
-      enter-to-class="transform opacity-100 scale-100"
-      leave-active-class="transition ease-in duration-75"
-      leave-from-class="transform opacity-100 scale-100"
-      leave-to-class="transform opacity-0 scale-95"
-    >
-      <ul
-        v-if="isDropdownOpen"
-        class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-200 py-1 z-50 max-h-96 overflow-y-auto"
-      >
-        <li
-          v-for="option in options"
-          :key="getOptionId(option)"
-          class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
-          :class="{
+    <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95"
+      enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75"
+      leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+      <ul v-if="isDropdownOpen"
+        class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-200 py-1 z-50 max-h-96 overflow-y-auto">
+        <li v-for="option in options" :key="getOptionId(option)"
+          class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors" :class="{
             'bg-blue-50 text-blue-600': isSelected(option),
-          }"
-          @click="selectOption(option)"
-        >
+          }" @click="selectOption(option)">
           <slot name="option" :option="option">
             <div class="flex flex-col">
               <span class="font-medium">{{ getOptionLabel(option) }}</span>
@@ -92,14 +70,14 @@ const dropdownRef = ref(null)
 
 const selectedOption = computed(() => {
   if (!props.selectedValue) return null
-  
+
   if (typeof props.selectedValue === 'object') {
     return props.selectedValue
   }
-  
+
   return props.options.find(option => {
-    const optionValue = typeof option === 'object' 
-      ? option[props.valueKey] 
+    const optionValue = typeof option === 'object'
+      ? option[props.valueKey]
       : option
     return optionValue === props.selectedValue
   })
@@ -136,15 +114,15 @@ const getOptionSubtitle = (option) => {
 
 const isSelected = (option) => {
   if (!selectedOption.value) return false
-  
-  const optionValue = typeof option === 'object' 
-    ? option[props.valueKey] 
+
+  const optionValue = typeof option === 'object'
+    ? option[props.valueKey]
     : option
-  
+
   if (typeof props.selectedValue === 'object') {
     return props.selectedValue === option
   }
-  
+
   return optionValue === props.selectedValue
 }
 

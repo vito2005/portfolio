@@ -3,7 +3,7 @@
     <h2 class="text-2xl font-semibold">{{ headerText }}</h2>
     <p class="text-gray-600">{{ descriptionText }}</p>
     <p class="text-gray-600">
-      {{ lessonsTextBefore }} 
+      {{ lessonsTextBefore }}
       <NuxtLink to="/lessons" class="text-blue-500 hover:underline">{{ lessonsLinkText }}</NuxtLink>
       {{ lessonsTextAfter }}
     </p>
@@ -59,4 +59,3 @@ onMounted(async () => {
   }
 })
 </script>
-

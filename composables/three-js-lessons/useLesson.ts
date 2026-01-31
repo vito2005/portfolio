@@ -2,18 +2,26 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import GUI from 'lil-gui'
+import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 
 
 export const useLesson = (canvasRef: Ref<HTMLCanvasElement>, containerRef: Ref<HTMLDivElement>) => {
     const sizes = {
         width: containerRef.value.clientWidth,
-        height: containerRef.value.clientHeight,
+        height: containerRef.value.clientHeight
     }
 
     /**
      * GUI
      */
     const gui = new GUI({ container: containerRef.value })
+
+
+    /**
+     * HDRLoader
+     */
+    const hdrLoader = new HDRLoader()
+
 
 
     /**
@@ -71,6 +79,7 @@ export const useLesson = (canvasRef: Ref<HTMLCanvasElement>, containerRef: Ref<H
         fontLoader,
         controls,
         renderer,
-        gui
+        gui,
+        hdrLoader
     }
 }

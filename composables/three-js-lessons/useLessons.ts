@@ -10,11 +10,19 @@ export interface Lesson {
 export const useLessons = () => {
     const lessons: Lesson[] = [
         {
+            id: '11',
+            title: 'Materials',
+            description: 'Creating and using materials in Three.js',
+            order: 11,
+            path: '/lessons/11-materials',
+            type: 'threejs'
+        },
+        {
             id: '12',
             title: '3D Text',
-            description: 'Creating 3D text with Three.js and animation',
+            description: 'Creating 3D text with Three.js',
             order: 12,
-            path: '/lessons/12',
+            path: '/lessons/12-text',
             type: 'threejs'
         }
     ]
