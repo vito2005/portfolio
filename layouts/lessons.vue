@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="h-screen min-h-0 flex flex-col overflow-hidden">
     <header class="border-b shadow-sm bg-white sticky top-0 z-50">
       <nav class="container mx-auto p-4">
         <div class="flex items-center justify-between">
@@ -27,7 +27,7 @@
         </div>
       </nav>
     </header>
-    <main class="flex-1 p-4">
+    <main class="flex-1 flex flex-col min-h-0 p-4">
       <slot />
     </main>
     <footer class="border-t">
@@ -37,11 +37,11 @@
             >Home</NuxtLink
           >
         </li>
-        <li>
+        <!-- <li>
           <NuxtLink to="/about" class="hover:shadow-sm rounded-md p-2"
             >About</NuxtLink
           >
-        </li>
+        </li> -->
         <li>
           <NuxtLink to="/lessons" class="hover:shadow-sm rounded-md p-2"
             >Lessons</NuxtLink

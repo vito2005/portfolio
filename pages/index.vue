@@ -13,10 +13,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const route = useRoute()
+const url = useRequestURL()
+const canonicalUrl = url.origin + route.path
+
+const seoTitle = 'Alex Buki — Software Engineer'
+const seoDescription =
+  "I'm learning WebGL and 3D graphics with Three.js. Here are the lessons I've completed along the way."
+
 useHead({
-  title: "Alex Buki - Software Engineer",
-  meta: [{ name: "description", content: "Alex Buki Software Engineer" }],
-});
+  title: seoTitle,
+  meta: [
+    { name: 'description', content: seoDescription },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: canonicalUrl },
+    { property: 'og:site_name', content: 'Alex Buki Developer' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+  ],
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+})
 
 const { typeText } = useTypewriter()
 

@@ -6,8 +6,8 @@ import GUI from 'lil-gui'
 
 export const useLesson = (canvasRef: Ref<HTMLCanvasElement>, containerRef: Ref<HTMLDivElement>) => {
     const sizes = {
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: containerRef.value.clientWidth,
+        height: containerRef.value.clientHeight,
     }
 
     /**

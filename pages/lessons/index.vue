@@ -29,10 +29,29 @@ const navigateToLesson = (lesson) => {
   router.push(lesson.path);
 };
 
+const route = useRoute()
+const url = useRequestURL()
+const canonicalUrl = url.origin + route.path
+
+const seoTitle = 'Three.js Lessons | Alex Buki Developer'
+const seoDescription =
+  'Collection of Three.js and WebGL lessons. Pick a lesson from the list and learn 3D graphics in the browser.'
+
 useHead({
-  title: "Three.js Lessons",
-  meta: [{ name: "description", content: "Three.js Lessons" }],
-});
+  title: seoTitle,
+  meta: [
+    { name: 'description', content: seoDescription },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: seoTitle },
+    { property: 'og:description', content: seoDescription },
+    { property: 'og:url', content: canonicalUrl },
+    { property: 'og:site_name', content: 'Alex Buki Developer' },
+    { name: 'twitter:card', content: 'summary' },
+    { name: 'twitter:title', content: seoTitle },
+    { name: 'twitter:description', content: seoDescription },
+  ],
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+})
 </script>
 
 <style lang="scss" scoped></style>
