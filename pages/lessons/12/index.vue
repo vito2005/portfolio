@@ -48,21 +48,16 @@ onMounted(() => {
     gui.domElement.style.top = '0'
     gui.domElement.style.right = '0'
 
-  const matcapTextures = [
-    textureLoader.load('/textures/matcaps/1.png'),
-    textureLoader.load('/textures/matcaps/2.png'),
-    textureLoader.load('/textures/matcaps/3.png'),
-    textureLoader.load('/textures/matcaps/4.png'),
-    textureLoader.load('/textures/matcaps/5.png'),
-    textureLoader.load('/textures/matcaps/6.png'),
-    textureLoader.load('/textures/matcaps/7.png'),
-    textureLoader.load('/textures/matcaps/8.png'),
+  const matcapTextures = new Array(8).fill(null)
 
-  ]
-  matcapTextures.forEach(texture => {
+  textureLoader.load('/textures/matcaps/8.png', (texture) => {
     texture.colorSpace = THREE.SRGBColorSpace
+    matcapTextures[7] = texture
+    material = new THREE.MeshMatcapMaterial({ matcap: texture })
+    initScene()
   })
-  material = new THREE.MeshMatcapMaterial({ matcap: matcapTextures[7] })
+
+  function initScene() {
 
   const updateText = () => {
     if (textMesh) {
@@ -117,7 +112,8 @@ onMounted(() => {
   gui.add(parameters, 'matcapTexture', matcapTextures.map((_, index) => index + 1))
     .name('Matcap Texture')
     .onChange((value) => {
-      material.matcap = matcapTextures[value - 1]
+      const tex = matcapTextures[value - 1]
+      if (tex) material.matcap = tex
     })
 
   gui.add(parameters, 'fontSize')
@@ -146,9 +142,23 @@ onMounted(() => {
     scene.add(donut)
   }
 
+  let firstFrameRendered = false
+
   const tick = () => {
     controls.update()
     renderer.render(scene, camera)
+
+    if (!firstFrameRendered) {
+      firstFrameRendered = true
+      for (let i = 0; i < 7; i++) {
+        textureLoader.load(`/textures/matcaps/${i + 1}.png`, (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace
+          matcapTextures[i] = tex
+          if (parameters.matcapTexture === i + 1) material.matcap = tex
+        })
+      }
+    }
+
     animationId = window.requestAnimationFrame(tick)
   }
 
@@ -171,6 +181,7 @@ onMounted(() => {
     if (renderer) {
       renderer.dispose()
     }
+  }
   }
 })
 </script>
