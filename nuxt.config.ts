@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/image', '@nuxtjs/tailwindcss'],
   app: {
     head: {
-      title: 'Alex Buki',
+      title: 'Alex Buki - Software Engineer',
       meta: [
         { name: 'description', content: 'Alex Buki Portfolio' },
 
@@ -16,5 +16,6 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     currencyKey: process.env.CURRENCY_API_KEY
-  }
+  },
+  css: ['~/assets/css/tailwind.css'],
 })
