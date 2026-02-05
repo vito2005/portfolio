@@ -13,8 +13,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
+
 const route = useRoute()
 const url = useRequestURL()
 const canonicalUrl = url.origin + route.path
