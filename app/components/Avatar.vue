@@ -50,6 +50,7 @@ onMounted(async () => {
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.setClearAlpha(0)
 
     controls.enableDamping = true
 
