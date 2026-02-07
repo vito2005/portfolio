@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div ref="canvasContainerRef" class="relative w-80 h-80 overflow-hidden rounded-xl">
+    <div ref="canvasContainerRef" class="mx-auto sm:mx-0 relative w-80 h-80 overflow-hidden rounded-xl">
         <canvas ref="canvasRef" class="w-full h-full outline-none" />
         <div
             v-show="modelLoading"
