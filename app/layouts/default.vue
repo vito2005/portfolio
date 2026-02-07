@@ -22,8 +22,9 @@ const year = new Date().getFullYear();
     <main class="flex-1 container mx-auto p-4">
       <slot />
     </main>
-    <footer class="border-t">
+    <footer class="border-t flex justify-between items-center">
       <p class="p-4 text-sm text-gray-500">Copyright {{ year }}</p>
+      <PoweredBy />
     </footer>
   </div>
 </template>
