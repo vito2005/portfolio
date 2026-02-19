@@ -1,6 +1,12 @@
 <template>
   <div ref="containerRef" class="flex-1 min-h-0 relative w-full overflow-hidden rounded-xl">
     <canvas ref="canvasRef" class="w-full h-full outline-none" />
+    <div
+      v-show="isLoading"
+      class="absolute inset-0 z-10 flex items-center justify-center bg-white/90 backdrop-blur-sm transition-opacity duration-200"
+    >
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-zinc-300 border-t-zinc-700" />
+    </div>
   </div>
 </template>
 
@@ -8,8 +14,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
-import { GroundedSkybox } from 'three/addons/objects/GroundedSkybox.js'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
 
 definePageMeta({
@@ -42,6 +46,7 @@ useHead({
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
+const isLoading = ref(true)
 
 let animationId
 let controls
@@ -58,7 +63,14 @@ onMounted(() => {
   gui = lessonGui
 
   const gltfLoader = new GLTFLoader()
-  // const rgbeLoader = new RGBELoader()
+  let pendingAssets = 2
+
+  const markAssetProcessed = () => {
+    pendingAssets -= 1
+    if (pendingAssets <= 0) {
+      isLoading.value = false
+    }
+  }
 
   gui.domElement.style.position = 'absolute'
   gui.domElement.style.top = '0'
@@ -87,11 +99,19 @@ onMounted(() => {
 //  * Real time environment map
 //  */
 // // Base environment map
-const environmentMap = textureLoader.load('/environmentMaps/blockadesLabsSkybox/interior_views_cozy_wood_cabin_with_cauldron_and_p.jpg')
-environmentMap.mapping = THREE.EquirectangularReflectionMapping
-environmentMap.colorSpace = THREE.SRGBColorSpace
-
-scene.background = environmentMap
+  textureLoader.load(
+    '/environmentMaps/blockadesLabsSkybox/interior_views_cozy_wood_cabin_with_cauldron_and_p.jpg',
+    (environmentMap) => {
+      environmentMap.mapping = THREE.EquirectangularReflectionMapping
+      environmentMap.colorSpace = THREE.SRGBColorSpace
+      scene.background = environmentMap
+      markAssetProcessed()
+    },
+    undefined,
+    () => {
+      markAssetProcessed()
+    }
+  )
 
   // // Holy donut
   const holyDonut = new THREE.Mesh(
@@ -124,10 +144,18 @@ scene.background = environmentMap
   torusKnot.position.y = 4
   scene.add(torusKnot)
 
-  gltfLoader.load('/models/FlightHelmet/glTF/FlightHelmet.gltf', (gltf) => {
-    gltf.scene.scale.set(10, 10, 10)
-    scene.add(gltf.scene)
-  })
+  gltfLoader.load(
+    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+    (gltf) => {
+      gltf.scene.scale.set(10, 10, 10)
+      scene.add(gltf.scene)
+      markAssetProcessed()
+    },
+    undefined,
+    () => {
+      markAssetProcessed()
+    }
+  )
 
   camera.position.set(8, 5, 10)
   controls.target.y = 3.5
