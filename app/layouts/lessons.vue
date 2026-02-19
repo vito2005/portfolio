@@ -6,12 +6,12 @@
           <div class="flex items-center gap-4">
             <NuxtLink to="/" class="text-xl font-semibold">A.B.</NuxtLink>
             |
-            <NuxtLink to="/lessons" class="text-lg">Lessons</NuxtLink>
+            <NuxtLink to="/lessons" class="text-lg">Examples</NuxtLink>
           </div>
           <Dropdown
             :options="allLessons"
             :selected-value="selectedLessonId"
-            placeholder="Select lesson"
+            placeholder="Select example"
             label-key="title"
             value-key="id"
             subtitle-key="order"
@@ -20,7 +20,7 @@
             <template #option="{ option }">
               <div class="flex flex-col">
                 <span class="font-medium">{{ option.title }}</span>
-                <span class="text-xs text-gray-500">Lesson {{ option.order }}</span>
+                <span class="text-xs text-gray-500">Example {{ option.order }}</span>
               </div>
             </template>
           </Dropdown>
@@ -44,7 +44,7 @@
         </li> -->
         <li>
           <NuxtLink to="/lessons" class="hover:shadow-sm rounded-md p-2"
-            >Lessons</NuxtLink
+            >Examples</NuxtLink
           >
         </li>
       </ul>

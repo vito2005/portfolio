@@ -14,7 +14,7 @@ const year = new Date().getFullYear();
             >
           </li> -->
           <li>
-            <NuxtLink to="/lessons" class="btn">Lessons</NuxtLink>
+            <NuxtLink to="/lessons" class="btn">Examples</NuxtLink>
           </li>
         </ul>
       </nav>

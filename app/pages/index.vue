@@ -53,7 +53,7 @@ const texts = [
   { text: "Hello, I'm Alex Buki - a software engineer.", ref: headerText },
   { text: "I'm currently learning WebGL technology and some 3D graphics libraries like Three.js.", ref: descriptionText },
   { text: "There are some ", ref: lessonsTextBefore },
-  { text: "lessons", ref: lessonsLinkText },
+  { text: "examples", ref: lessonsLinkText },
   { text: " I've passed while learning these technologies.", ref: lessonsTextAfter },
 ]
 
