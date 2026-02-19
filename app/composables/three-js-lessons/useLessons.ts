@@ -24,6 +24,14 @@ export const useLessons = () => {
             order: 12,
             path: '/lessons/12-text',
             type: 'threejs'
+        },
+        {
+            id: '24',
+            title: 'Environment Map',
+            description: 'Environment maps and HDR lighting in Three.js',
+            order: 24,
+            path: '/lessons/24-environment-map',
+            type: 'threejs'
         }
     ]
 
