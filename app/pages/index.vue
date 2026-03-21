@@ -22,7 +22,7 @@ const canonicalUrl = url.origin + route.path
 
 const seoTitle = 'Alex Buki — Software Engineer'
 const seoDescription =
-  "I'm learning WebGL and 3D graphics with Three.js. Here are the lessons I've completed along the way."
+  "I'm learning WebGL and 3D graphics with Three.js. Here are the examples I've completed along the way."
 
 useHead({
   title: seoTitle,

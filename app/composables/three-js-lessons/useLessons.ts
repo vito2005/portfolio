@@ -26,6 +26,14 @@ export const useLessons = () => {
             type: 'threejs'
         },
         {
+            id: '16',
+            title: 'Haunted House',
+            description: 'Building a haunted house scene with textures, lights, shadows and fog',
+            order: 16,
+            path: '/lessons/16-haunted-house',
+            type: 'threejs'
+        },
+        {
             id: '24',
             title: 'Environment Map',
             description: 'Environment maps and HDR lighting in Three.js',
