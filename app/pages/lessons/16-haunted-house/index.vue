@@ -374,6 +374,8 @@ onMounted(() => {
    */
   scene.fog = new THREE.FogExp2('#04343f', 0.1)
 
+  gui.add(scene.fog, 'density').min(0).max(0.5).step(0.001).name('fogDensity')
+
   /**
    * Camera
    */
