@@ -1,41 +1,45 @@
 <template>
-  <div class="mx-auto container px-4">
-    <h1 class="text-3xl font-bold mb-6">Three.js Examples</h1>
-    <p class="text-gray-600 mb-8">
-      Select an example from the dropdown menu above or click on a card below
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <LessonCard v-for="lesson in lessons" :key="lesson.id" :lesson="lesson" @click="navigateToLesson(lesson)" />
+  <div class="container mx-auto px-4 overflow-scroll">
+    <div class="mb-10">
+      <p class="text-xs font-semibold text-[#12b488] tracking-[0.2em] uppercase mb-3">Three.js</p>
+      <h1 class="font-serif text-4xl sm:text-5xl text-gray-900">Examples</h1>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <LessonCard
+        v-for="lesson in lessons"
+        :key="lesson.id"
+        :lesson="lesson"
+        @click="navigateToLesson(lesson)"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { useLessons } from '@/composables/three-js-lessons/useLessons';
-import LessonCard from '@/components/LessonCard.vue';
-import { useRouter } from 'vue-router';
+import { useLessons } from '@/composables/three-js-lessons/useLessons'
+import LessonCard from '@/components/LessonCard.vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 definePageMeta({
-  layout: "lessons",
-});
+  layout: 'lessons',
+})
 
-const { getAllLessons } = useLessons();
-
-const lessons = computed(() => getAllLessons());
+const { getAllLessons } = useLessons()
+const lessons = computed(() => getAllLessons())
 
 const navigateToLesson = (lesson) => {
-  router.push(lesson.path);
-};
+  router.push(lesson.path)
+}
 
 const route = useRoute()
 const url = useRequestURL()
 const canonicalUrl = url.origin + route.path
 
-const seoTitle = 'Three.js Examples | Alex Buki Developer'
+const seoTitle = 'Three.js Examples | Alex Buki'
 const seoDescription =
-  'Collection of Three.js and WebGL examples. Pick an example from the list and learn 3D graphics in the browser.'
+  'Collection of Three.js and WebGL examples — materials, 3D text, shaders, lighting, and more.'
 
 useHead({
   title: seoTitle,
@@ -45,7 +49,7 @@ useHead({
     { property: 'og:title', content: seoTitle },
     { property: 'og:description', content: seoDescription },
     { property: 'og:url', content: canonicalUrl },
-    { property: 'og:site_name', content: 'Alex Buki Developer' },
+    { property: 'og:site_name', content: 'Alex Buki' },
     { name: 'twitter:card', content: 'summary' },
     { name: 'twitter:title', content: seoTitle },
     { name: 'twitter:description', content: seoDescription },
@@ -53,5 +57,3 @@ useHead({
   link: [{ rel: 'canonical', href: canonicalUrl }],
 })
 </script>
-
-<style lang="scss" scoped></style>

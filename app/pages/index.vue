@@ -1,28 +1,36 @@
 <template>
-  <div class="flex flex-col sm:flex-row items-start">
-    <Avatar @loaded="onAvatarLoaded" />
-    <div class="sm:mt-10">
-      <h2 class="text-2xl font-semibold">{{ headerText }}</h2>
-      <p class="text-gray-600 mt-2">{{ descriptionText }}</p>
-      <p class="text-gray-600 mt-2">
-        {{ lessonsTextBefore }}
-        <NuxtLink to="/lessons" class="text-blue-500 hover:underline">{{ lessonsLinkText }}</NuxtLink>
-        {{ lessonsTextAfter }}
-      </p>
+  <section class="flex flex-col-reverse sm:flex-row items-center sm:items-start gap-12 pt-4 sm:pt-12">
+    <div class="flex-1 sm:pt-6">
+      <p class="text-xs font-semibold text-[#12b488] tracking-[0.2em] uppercase mb-4">3D Web Engineer</p>
+      <h1 class="font-serif text-5xl sm:text-6xl leading-[1.1] text-gray-900 mb-6">Alex Buki</h1>
+      <p class="text-gray-500 leading-relaxed max-w-sm mb-8 min-h-[5rem]">{{ descriptionText }}</p>
+      <div
+        class="flex flex-wrap gap-3 transition-opacity duration-700"
+        :class="showLinks ? 'opacity-100' : 'opacity-0'"
+      >
+        <NuxtLink to="/lessons" class="btn">View examples</NuxtLink>
+        <a
+          href="https://www.linkedin.com/in/aleksandr-buki"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-outline"
+        >LinkedIn ↗</a>
+      </div>
     </div>
-  </div>
+    <div class="flex-shrink-0">
+      <Avatar @loaded="onAvatarLoaded" />
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
 const route = useRoute()
 const url = useRequestURL()
 const canonicalUrl = url.origin + route.path
 
-const seoTitle = 'Alex Buki — Software Engineer'
+const seoTitle = 'Alex Buki — 3D Web Engineer'
 const seoDescription =
-  "I'm learning WebGL and 3D graphics with Three.js. Here are the examples I've completed along the way."
+  'Senior Frontend Engineer specializing in interactive 3D scenes, shaders, and animations for the web.'
 
 useHead({
   title: seoTitle,
@@ -33,7 +41,7 @@ useHead({
     { property: 'og:description', content: seoDescription },
     { property: 'og:url', content: canonicalUrl },
     { property: 'og:image', content: url.origin + '/og-image.png' },
-    { property: 'og:site_name', content: 'Alex Buki Developer' },
+    { property: 'og:site_name', content: 'Alex Buki' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: seoTitle },
     { name: 'twitter:description', content: seoDescription },
@@ -43,24 +51,14 @@ useHead({
 
 const { typeText } = useTypewriter()
 
-const headerText = ref('')
 const descriptionText = ref('')
-const lessonsTextBefore = ref('')
-const lessonsLinkText = ref('')
-const lessonsTextAfter = ref('')
-
-const texts = [
-  { text: "Hello, I'm Alex Buki - a software engineer.", ref: headerText },
-  { text: "I'm currently learning WebGL technology and some 3D graphics libraries like Three.js.", ref: descriptionText },
-  { text: "There are some ", ref: lessonsTextBefore },
-  { text: "examples", ref: lessonsLinkText },
-  { text: " I've passed while learning these technologies.", ref: lessonsTextAfter },
-]
+const showLinks = ref(false)
 
 async function onAvatarLoaded() {
-  for (const { text, ref } of texts) {
-    await nextTick()
-    await typeText(text, ref)
-  }
+  await typeText(
+    'Senior Frontend Engineer specializing in interactive 3D scenes and animations for the web using Three.js.',
+    descriptionText
+  )
+  showLinks.value = true
 }
 </script>

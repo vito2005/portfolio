@@ -1,36 +1,31 @@
 <template>
-  <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer bg-white" @click="handleClick">
-    <div class="flex items-center justify-between mb-4">
-      <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-        Lesson {{ lesson.order }}
+  <div
+    class="bg-white border border-gray-200 rounded-xl p-6 cursor-pointer hover:border-[#12b488] hover:shadow-sm transition-all duration-200 group"
+    @click="handleClick"
+  >
+    <div class="flex items-start justify-between mb-5">
+      <span class="text-xs font-semibold text-[#12b488] tracking-widest uppercase">
+        Ex. {{ lesson.order }}
       </span>
-      <span v-if="lesson.type === 'threejs'" class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">
+      <span class="text-[10px] font-medium text-gray-400 tracking-wider uppercase bg-gray-100 px-2 py-1 rounded">
         Three.js
       </span>
     </div>
-    <h2 class="text-xl font-semibold mb-2">{{ lesson.title }}</h2>
-    <p class="text-gray-600 text-sm">{{ lesson.description }}</p>
+    <h2 class="font-serif text-xl mb-2 group-hover:text-[#12b488] transition-colors">{{ lesson.title }}</h2>
+    <p class="text-gray-500 text-sm leading-relaxed">{{ lesson.description }}</p>
   </div>
 </template>
 
 <script setup>
-const emit = defineEmits(['click']);
+const emit = defineEmits(['click'])
 const { lesson } = defineProps({
   lesson: {
     type: Object,
     required: true,
   },
-});
-
+})
 
 const handleClick = () => {
-  emit('click', lesson);
-};
-
-</script>
-
-<style scoped>
-.thumb {
-  @apply h-48 object-cover rounded-lg max-w-[70%] mx-auto;
+  emit('click', lesson)
 }
-</style>
+</script>

@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  /* @apply bg-gray-50; */
+@layer base {
+  html, body {
+    background-color: #F9F8F6;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: #111111;
+  }
 
   .router-link-exact-active {
     color: #12b488;
@@ -12,9 +16,12 @@ body {
 
 @layer components {
   .btn {
-    @apply bg-[#12b488] text-white px-4 py-2 rounded-md text-sm;
+    @apply inline-flex items-center bg-[#12b488] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90;
+  }
+  .btn-outline {
+    @apply inline-flex items-center border border-gray-300 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-medium hover:border-gray-500 hover:text-gray-900 transition-colors;
   }
   .card {
-    @apply bg-white rounded-lg shadow-md p-4 h-full;
+    @apply bg-white rounded-xl border border-gray-200 p-6;
   }
 }

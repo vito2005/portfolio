@@ -1,12 +1,12 @@
 <template>
-  <div class="h-screen min-h-0 flex flex-col overflow-hidden">
-    <header class="border-b shadow-sm bg-white sticky top-0 z-50">
-      <nav class="container mx-auto p-4">
+  <div class="h-screen min-h-0 flex flex-col overflow-hidden bg-[#F9F8F6]">
+    <header class="border-b border-gray-200 sticky top-0 z-50 bg-[#F9F8F6]">
+      <nav class="container mx-auto px-6 py-5">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <NuxtLink to="/" class="text-xl font-semibold">A.B.</NuxtLink>
-            |
-            <NuxtLink to="/lessons" class="text-lg">Examples</NuxtLink>
+          <div class="flex items-center gap-5">
+            <NuxtLink to="/" class="font-serif italic text-xl text-gray-900 tracking-tight">A.B.</NuxtLink>
+            <span class="text-gray-300">|</span>
+            <NuxtLink to="/lessons" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Examples</NuxtLink>
           </div>
           <Dropdown
             :options="allLessons"
@@ -30,24 +30,11 @@
     <main class="flex-1 flex flex-col min-h-0 p-4">
       <slot />
     </main>
-    <footer class="border-t">
-      <ul class="container mx-auto p-4 flex gap-4 text-sm text-gray-600">
-        <li>
-          <NuxtLink to="/" class="hover:shadow-sm rounded-md p-2"
-            >Home</NuxtLink
-          >
-        </li>
-        <!-- <li>
-          <NuxtLink to="/about" class="hover:shadow-sm rounded-md p-2"
-            >About</NuxtLink
-          >
-        </li> -->
-        <li>
-          <NuxtLink to="/lessons" class="hover:shadow-sm rounded-md p-2"
-            >Examples</NuxtLink
-          >
-        </li>
-      </ul>
+    <footer class="border-t border-gray-200">
+      <div class="container mx-auto px-6 py-4 flex gap-6 text-xs text-gray-400">
+        <NuxtLink to="/" class="hover:text-gray-700 transition-colors">Home</NuxtLink>
+        <NuxtLink to="/lessons" class="hover:text-gray-700 transition-colors">Examples</NuxtLink>
+      </div>
     </footer>
   </div>
 </template>
