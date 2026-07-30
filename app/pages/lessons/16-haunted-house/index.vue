@@ -263,7 +263,11 @@ onMounted(() => {
   house.add(bush1, bush2, bush3, bush4)
 
   // Graves
-  const graveGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.2)
+  const graveWidth = 0.6
+  const graveHeight = 0.8
+  const graveThickness = 0.2
+
+  const graveGeometry = new THREE.BoxGeometry(graveWidth, graveHeight, graveThickness)
   const graveMaterial = new THREE.MeshStandardMaterial({
     map: graveColorTexture,
     normalMap: graveNormalTexture,
@@ -275,22 +279,59 @@ onMounted(() => {
   const graves = new THREE.Group()
   scene.add(graves)
 
+  /**
+   * Inscriptions
+   */
+  const inscriptionVariantCount = 24
+  const carvedLetterColor = '#241f19'
+  const carvedGrooveDepth = 1.4
+  const inscriptionOffsetFromFace = 0.002
+
+  const inscriptionGeometry = new THREE.PlaneGeometry(graveWidth, graveHeight)
+  const inscriptionMaterials = []
+
+  for (let variant = 1; variant <= inscriptionVariantCount; variant++) {
+    const epitaph = String(variant).padStart(2, '0')
+
+    inscriptionMaterials.push(new THREE.MeshStandardMaterial({
+      color: carvedLetterColor,
+      transparent: true,
+      alphaMap: textureLoader.load(`/textures/grave/inscription/${epitaph}_alpha.webp`),
+      normalMap: textureLoader.load(`/textures/grave/inscription/${epitaph}_normal.webp`),
+      normalScale: new THREE.Vector2(carvedGrooveDepth, carvedGrooveDepth),
+      roughness: 1,
+      metalness: 0,
+      depthWrite: false
+    }))
+  }
+
+  const inscriptions = []
+
   for (let i = 0; i < 30; i++) {
-    const angle = Math.random() * Math.PI * 2
+    const angleAroundHouse = Math.random() * Math.PI * 2
     const radius = 3 + Math.random() * 4
-    const x = Math.sin(angle) * radius
-    const z = Math.cos(angle) * radius
+    const inscribedFaceAimedAwayFromHouse = angleAroundHouse
 
     const grave = new THREE.Mesh(graveGeometry, graveMaterial)
-    grave.position.x = x
+    grave.position.x = Math.sin(angleAroundHouse) * radius
     grave.position.y = Math.random() * 0.4
-    grave.position.z = z
+    grave.position.z = Math.cos(angleAroundHouse) * radius
     grave.rotation.x = (Math.random() - 0.5) * 0.4
-    grave.rotation.y = (Math.random() - 0.5) * 0.4
+    grave.rotation.y = inscribedFaceAimedAwayFromHouse + (Math.random() - 0.5) * 0.4
     grave.rotation.z = (Math.random() - 0.5) * 0.4
 
+    const inscription = new THREE.Mesh(inscriptionGeometry, inscriptionMaterials[i % inscriptionVariantCount])
+    inscription.position.z = graveThickness * 0.5 + inscriptionOffsetFromFace
+    inscription.receiveShadow = true
+
+    grave.add(inscription)
+    inscriptions.push(inscription)
     graves.add(grave)
   }
+
+  gui.add({ inscriptions: true }, 'inscriptions').onChange((value) => {
+    for (const inscription of inscriptions) inscription.visible = value
+  })
 
   /**
    * Lights
@@ -309,10 +350,16 @@ onMounted(() => {
   /**
    * Ghosts
    */
-  const ghost1 = new THREE.PointLight('#8800ff', 6)
-  const ghost2 = new THREE.PointLight('#ff0088', 6)
-  const ghost3 = new THREE.PointLight('#ff0000', 6)
-  scene.add(ghost1, ghost2, ghost3)
+  const ghosts = [
+    { color: '#8800ff', radius: 4, speed: 0.5, phase: 0 },
+    { color: '#ff0088', radius: 5, speed: -0.38, phase: 1.05 },
+    { color: '#ff0000', radius: 6, speed: 0.23, phase: 2.1 },
+    { color: '#00b3ff', radius: 4.5, speed: -0.62, phase: 3.14 },
+    { color: '#37ff8b', radius: 5.5, speed: 0.44, phase: 4.19 },
+    { color: '#ffb347', radius: 6.5, speed: -0.29, phase: 5.24 }
+  ].map(ghost => ({ ...ghost, light: new THREE.PointLight(ghost.color, 6) }))
+
+  scene.add(...ghosts.map(ghost => ghost.light))
 
   /**
    * Shadows
@@ -321,9 +368,6 @@ onMounted(() => {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
   directionalLight.castShadow = true
-  ghost1.castShadow = true
-  ghost2.castShadow = true
-  ghost3.castShadow = true
 
   walls.castShadow = true
   walls.receiveShadow = true
@@ -344,17 +388,14 @@ onMounted(() => {
   directionalLight.shadow.camera.near = 1
   directionalLight.shadow.camera.far = 20
 
-  ghost1.shadow.mapSize.width = 256
-  ghost1.shadow.mapSize.height = 256
-  ghost1.shadow.camera.far = 10
+  const shadowCastingGhostCount = 3
 
-  ghost2.shadow.mapSize.width = 256
-  ghost2.shadow.mapSize.height = 256
-  ghost2.shadow.camera.far = 10
-
-  ghost3.shadow.mapSize.width = 256
-  ghost3.shadow.mapSize.height = 256
-  ghost3.shadow.camera.far = 10
+  for (const { light } of ghosts.slice(0, shadowCastingGhostCount)) {
+    light.castShadow = true
+    light.shadow.mapSize.width = 256
+    light.shadow.mapSize.height = 256
+    light.shadow.camera.far = 10
+  }
 
   /**
    * Sky
@@ -392,20 +433,13 @@ onMounted(() => {
   const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
-    const ghost1Angle = elapsedTime * 0.5
-    ghost1.position.x = Math.cos(ghost1Angle) * 4
-    ghost1.position.z = Math.sin(ghost1Angle) * 4
-    ghost1.position.y = Math.sin(ghost1Angle) * Math.sin(ghost1Angle * 2.34) * Math.sin(ghost1Angle * 3.45)
+    for (const { light, radius, speed, phase } of ghosts) {
+      const angle = elapsedTime * speed + phase
 
-    const ghost2Angle = -elapsedTime * 0.38
-    ghost2.position.x = Math.cos(ghost2Angle) * 5
-    ghost2.position.z = Math.sin(ghost2Angle) * 5
-    ghost2.position.y = Math.sin(ghost2Angle) * Math.sin(ghost2Angle * 2.34) * Math.sin(ghost2Angle * 3.45)
-
-    const ghost3Angle = elapsedTime * 0.23
-    ghost3.position.x = Math.cos(ghost3Angle) * 6
-    ghost3.position.z = Math.sin(ghost3Angle) * 6
-    ghost3.position.y = Math.sin(ghost3Angle) * Math.sin(ghost3Angle * 2.34) * Math.sin(ghost3Angle * 3.45)
+      light.position.x = Math.cos(angle) * radius
+      light.position.z = Math.sin(angle) * radius
+      light.position.y = Math.sin(angle) * Math.sin(angle * 2.34) * Math.sin(angle * 3.45)
+    }
 
     controls.update()
     renderer.render(scene, camera)

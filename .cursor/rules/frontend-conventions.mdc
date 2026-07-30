@@ -1,0 +1,17 @@
+---
+description: Frontend code conventions for this Nuxt + Three.js portfolio
+globs: app/**
+alwaysApply: false
+---
+
+Code conventions for this project are defined in @AGENTS.md.
+
+Follow them for every `.vue`, `.ts` and `.css` file under `app/`: build scenes
+through `useLesson`, always tear a scene down in `onUnmounted` (cancel the tick,
+dispose geometries/materials/textures/renderer, clear timers and listeners), size
+the canvas from its container rather than the window, keep lesson pages thin by
+moving heavy logic into `composables/three-js-lessons/`, register every new
+lesson in `useLessons.ts`, give each page its SEO `useHead` block, use
+`<script setup lang="ts">` and avoid `any`, reuse the `.btn` / `.card` Tailwind
+component classes instead of new raw hex values, reserve `handle*` names for
+event handlers, and delete dead or commented-out code.
