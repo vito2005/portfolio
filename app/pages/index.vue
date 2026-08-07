@@ -9,6 +9,7 @@
         :class="showLinks ? 'opacity-100' : 'opacity-0'"
       >
         <NuxtLink to="/lessons" class="btn">View examples</NuxtLink>
+        <a href="https://games.abuki.dev" class="btn-outline">Playables ↗</a>
         <a
           href="https://www.linkedin.com/in/aleksandr-buki"
           target="_blank"

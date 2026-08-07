@@ -14,6 +14,12 @@ const year = new Date().getFullYear()
             </NuxtLink>
           </li>
           <li>
+            <!-- Separate site, separate deploy — see games/ in this repo. -->
+            <a href="https://games.abuki.dev" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              Playables
+            </a>
+          </li>
+          <li>
             <a
               href="https://www.linkedin.com/in/aleksandr-buki"
               target="_blank"
