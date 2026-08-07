@@ -1,0 +1,22 @@
+{
+  "name": "playable-marble-run",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "3D playable ad demo: one source, one single-file HTML per ad network.",
+  "scripts": {
+    "dev": "vite",
+    "build": "node build.mjs",
+    "publish:site": "node publish-to-site.mjs",
+    "harness": "node harness/server.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "vite": "^6.2.2",
+    "vite-plugin-singlefile": "^2.1.0"
+  }
+}

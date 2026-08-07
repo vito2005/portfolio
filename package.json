@@ -9,7 +9,10 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "start": "node .output/server/index.mjs",
-    "lint": "nuxt prepare && eslint ."
+    "lint": "nuxt prepare && eslint .",
+    "games:dev": "npm --prefix games run dev",
+    "games:build": "npm --prefix games install && npm --prefix games run build",
+    "games:start": "node games/.output/server/index.mjs"
   },
   "dependencies": {
     "@nuxt/image": "^1.11.0",

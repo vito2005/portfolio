@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Marble Rush</title>
+    <!-- Empty data URI: stops the WebView firing a stray /favicon.ico request. -->
+    <link rel="icon" href="data:," />
+    <!--
+      Google's HTML5 asset validator expects a `clickTag` global and flags any
+      creative without one. A playable clicks through MRAID rather than clickTag,
+      but declaring it is free, keeps that check green, and gives `src/ads.js`
+      one more place to read the destination from.
+    -->
+    <script>
+      var clickTag = 'https://play.google.com/store/apps/details?id=com.skywaylab.marblerush'
+    </script>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <div id="ui">
+      <!-- Progress along the track, doubles as the "almost there" nudge -->
+      <div id="hud">
+        <div id="progress"><div id="progress-fill"></div></div>
+        <div id="gems"><span id="gems-icon"></span><span id="gems-count">0</span></div>
+        <div id="lives">
+          <i class="life"></i><i class="life"></i><i class="life"></i>
+        </div>
+      </div>
+
+      <!-- Shown until the first drag; a playable must teach its control in one glance -->
+      <div id="tutorial">
+        <div id="hand"></div>
+        <p>Swipe to steer</p>
+      </div>
+
+      <div id="endcard" class="hidden">
+        <h1 id="endcard-title">Nice run!</h1>
+        <p id="endcard-text">You collected 0 gems</p>
+        <button id="cta" type="button">Play now</button>
+        <button id="replay" type="button">Try again</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

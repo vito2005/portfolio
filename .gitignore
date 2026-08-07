@@ -17,6 +17,9 @@ logs
 .playwright-mcp
 *.local
 
+# Three.js Journey course files kept locally for reference, not part of the site
+/66-create-a-game-with-r3f-final
+
 # Misc
 .DS_Store
 .fleet

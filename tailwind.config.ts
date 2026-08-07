@@ -1,12 +1,6 @@
 import type { Config } from 'tailwindcss'
+import designPreset from './shared/design/preset'
 
 export default {
-  theme: {
-    extend: {
-      fontFamily: {
-        serif: ['"DM Serif Display"', 'Georgia', 'serif'],
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
-      },
-    },
-  },
-} satisfies Config
+  presets: [designPreset],
+} satisfies Partial<Config>
