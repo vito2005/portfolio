@@ -1,19 +1,25 @@
 /**
- * The only place that talks to an ad network.
+ * The only place that talks to an ad network. Shared by every creative.
  *
  * `__ADAPTER__` is replaced at build time by vite, so a build for one network
  * never carries another network's code.
  */
-import { CONFIG } from './config.js'
 
 const adapter = typeof __ADAPTER__ === 'string' ? __ADAPTER__ : 'preview'
 
 /** A container that loads its SDK but never fires `ready` must not leave a blank ad. */
 const READY_TIMEOUT = 3000
 
+let fallbackStoreUrl = ''
+
+/** Each creative hands over its own campaign link at boot. */
+export function setStoreUrl(url) {
+  fallbackStoreUrl = url
+}
+
 /** Ad servers rewrite `clickTag` to their own tracking URL, so it wins when present. */
 function storeUrl() {
-  return typeof window.clickTag === 'string' && window.clickTag ? window.clickTag : CONFIG.storeUrl
+  return typeof window.clickTag === 'string' && window.clickTag ? window.clickTag : fallbackStoreUrl
 }
 
 function canCall(host, method) {

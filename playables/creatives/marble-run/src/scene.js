@@ -7,7 +7,7 @@ import {
   SRGBColorSpace,
   WebGLRenderer,
 } from 'three'
-import { createCanvasTexture } from './textures.js'
+import { createCanvasTexture } from '../../../shared/textures.js'
 
 const BACKGROUND = 0x141d33
 

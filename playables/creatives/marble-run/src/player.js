@@ -9,7 +9,7 @@ import {
   Vector3,
 } from 'three'
 import { CONFIG } from './config.js'
-import { createRadialTexture } from './textures.js'
+import { createRadialTexture } from '../../../shared/textures.js'
 
 const BLACK = new Color(0x000000)
 const HIT_FLASH = new Color(0xff3355)

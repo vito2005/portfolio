@@ -1,9 +1,9 @@
 {
-  "name": "playable-marble-run",
+  "name": "playables",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "3D playable ad demo: one source, one single-file HTML per ad network.",
+  "description": "Playable ad creatives: shared engine and ad-network layer, one folder per creative.",
   "scripts": {
     "dev": "vite",
     "build": "node build.mjs",

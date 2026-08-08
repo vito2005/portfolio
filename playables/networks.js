@@ -12,8 +12,8 @@
 const MB = 1024 * 1024
 
 /** One naming convention, shared by the build, the harness and publishing. */
-export function outputFile(networkId) {
-  return `marble-run-${networkId}.html`
+export function outputFile(creativeId, networkId) {
+  return `${creativeId}-${networkId}.html`
 }
 
 export const NETWORKS = [

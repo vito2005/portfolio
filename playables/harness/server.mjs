@@ -7,16 +7,17 @@
  * The failure mode lives in the path, not a query string — the creative asks for
  * its SDK by relative path (`mraid.js`), which a query string would not reach.
  *
- *   /play/ok/google.html          SDK loads, ready fires at once
- *   /play/never/applovin.html     ready never fires — the watchdog must take over
- *   /play/missing/google.html     the SDK script 404s
- *   /play/broken/ironsource.html  the CTA call throws
+ *   /play/ok/marble-run/google.html          SDK loads, ready fires at once
+ *   /play/never/sort-3d/applovin.html        ready never fires — watchdog takes over
+ *   /play/missing/marble-run/google.html     the SDK script 404s
+ *   /play/broken/marble-run/ironsource.html  the CTA call throws
  */
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { fileURLToPath } from 'node:url'
+import { CREATIVES } from '../creatives.js'
 import { NETWORKS, outputFile } from '../networks.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
@@ -33,16 +34,16 @@ const MODES = [
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' }
 
-function builtFile(networkId) {
-  return path.join(distDir, outputFile(networkId))
-}
-
 /**
  * SDKs the creative cannot ask for by relative path: Meta injects a global with
  * no script at all, and Google loads its Exit API from its own domain. Both get
  * a local stub so the simulator keeps working offline.
  */
 const INJECTED_STUBS = { meta: 'meta.js', google: 'exitapi.js' }
+
+function builtFile(creativeId, networkId) {
+  return path.join(distDir, outputFile(creativeId, networkId))
+}
 
 /** Puts the console, and any stubbed SDK, in front of the creative. */
 function injectHarness(html, network, mode) {
@@ -81,20 +82,27 @@ function sendFile(response, file) {
 }
 
 function launcherPage() {
-  const available = NETWORKS.filter(network => fs.existsSync(builtFile(network.id)))
+  const sections = CREATIVES.map((creative) => {
+    const available = NETWORKS.filter(network => fs.existsSync(builtFile(creative.id, network.id)))
+    if (!available.length) {
+      return ''
+    }
 
-  if (!available.length) {
+    const rows = available.map((network) => {
+      const links = MODES.map(mode => (
+        `<a href="/play/${mode.id}/${creative.id}/${network.id}.html" title="${mode.hint}">${mode.label}</a>`
+      )).join('')
+      return `<tr><th>${network.label}</th><td>${links}</td></tr>`
+    }).join('')
+
+    return `<h2>${creative.label}</h2><table>${rows}</table>`
+  }).filter(Boolean).join('')
+
+  if (!sections) {
     return '<meta name="viewport" content="width=device-width,initial-scale=1">'
       + '<body style="font:16px system-ui;padding:32px">'
       + '<h1>No builds found</h1><p>Run <code>npm run build</code> first.</p>'
   }
-
-  const rows = available.map((network) => {
-    const links = MODES.map(mode => (
-      `<a href="/play/${mode.id}/${network.id}.html" title="${mode.hint}">${mode.label}</a>`
-    )).join('')
-    return `<tr><th>${network.label}</th><td>${links}</td></tr>`
-  }).join('')
 
   const legend = MODES.map(mode => `<li><b>${mode.label}</b> — ${mode.hint}</li>`).join('')
 
@@ -105,7 +113,8 @@ function launcherPage() {
   body{margin:0;padding:28px 20px 60px;background:#0d1424;color:#e8eeff;
     font:15px/1.5 system-ui,-apple-system,sans-serif}
   h1{font-size:20px;margin:0 0 4px}
-  p.sub{margin:0 0 26px;color:#7f93bd;font-size:13px}
+  h2{font-size:15px;margin:28px 0 2px;color:#12b488}
+  p.sub{margin:0 0 8px;color:#7f93bd;font-size:13px}
   table{width:100%;border-collapse:collapse}
   th{text-align:left;font-size:13px;color:#9db3e0;padding:12px 0 6px;font-weight:600}
   td{padding:0 0 14px}
@@ -117,9 +126,9 @@ function launcherPage() {
   b{color:#cfe0ff}
 </style></head><body>
 <h1>Ad container simulator</h1>
-<p class="sub">Pick a network and a failure mode. The log panel at the bottom of the
-creative shows every SDK call, plus the frame rate.</p>
-<table>${rows}</table>
+<p class="sub">Pick a creative, a network and a failure mode. The log panel at the
+bottom of the creative shows every SDK call, plus the frame rate.</p>
+${sections}
 <ul>${legend}</ul>
 </body></html>`
 }
@@ -150,17 +159,23 @@ const server = http.createServer((request, response) => {
     return
   }
 
-  // /play/<mode>/<file>
-  if (parts[0] === 'play' && parts.length === 3) {
-    const [, mode, file] = parts
+  // /play/<mode>/<creative>/<file>
+  if (parts[0] === 'play' && parts.length === 4) {
+    const [, mode, creativeId, file] = parts
+    const creative = CREATIVES.find(item => item.id === creativeId)
+
+    if (!creative) {
+      send(response, 404, `Unknown creative "${creativeId}"`, 'text/plain')
+      return
+    }
 
     if (file.endsWith('.html')) {
       const networkId = file.replace(/\.html$/, '')
       const network = NETWORKS.find(item => item.id === networkId)
-      const source = network && builtFile(networkId)
+      const source = network && builtFile(creativeId, networkId)
 
       if (!source || !fs.existsSync(source)) {
-        send(response, 404, `No build for "${networkId}" — run npm run build`, 'text/plain')
+        send(response, 404, `No build for ${creativeId}/${networkId} — run npm run build`, 'text/plain')
         return
       }
 

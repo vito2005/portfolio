@@ -1,6 +1,9 @@
 import './style.css'
+import { CONFIG } from './config.js'
 import { createGame } from './game.js'
-import { whenReady } from './ads.js'
+import { setStoreUrl, whenReady } from '../../../shared/ads.js'
+
+setStoreUrl(CONFIG.storeUrl)
 
 const canvas = document.getElementById('scene')
 const game = createGame(canvas)

@@ -2,12 +2,12 @@ import { CONFIG } from './config.js'
 import { createScene } from './scene.js'
 import { COLORS, createLevel } from './level.js'
 import { createPlayer } from './player.js'
-import { createInput } from './input.js'
+import { createInput } from '../../../shared/input.js'
 import { createUi } from './ui.js'
-import { createAudio } from './audio.js'
-import { createJuice } from './juice.js'
-import { sphereHitsBox } from './collision.js'
-import { openStore, reportEnd, reportStart } from './ads.js'
+import { createAudio } from '../../../shared/audio.js'
+import { createJuice } from '../../../shared/juice.js'
+import { sphereHitsBox } from '../../../shared/collision.js'
+import { openStore, reportEnd, reportStart } from '../../../shared/ads.js'
 
 /** Only obstacles this close to the marble are worth a collision test. */
 const COLLISION_RANGE = 2.5
@@ -22,7 +22,7 @@ export function createGame(canvas) {
   const input = createInput(canvas)
   const ui = createUi()
   const audio = createAudio()
-  const juice = createJuice(scene)
+  const juice = createJuice(scene, CONFIG.juice)
 
   const runLength = level.startZ - level.finishZ
 
@@ -209,6 +209,9 @@ export function createGame(canvas) {
   ui.onCta(openStore)
   ui.onReplay(() => {
     reset()
+    // A replay can happen before the player ever touched the screen — if the
+    // idle timeout ended the first run, the tutorial would still be up.
+    ui.hideTutorial()
     phase = 'playing'
   })
 

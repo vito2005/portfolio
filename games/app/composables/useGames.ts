@@ -62,6 +62,36 @@ const GAMES: Game[] = [
     proofImage: '/playables/marble-run/google-validator.png',
     proofCaption: 'Google H5 validator, App campaigns mode — 23 checks, 0 errors',
   },
+  {
+    id: 'sort-3d',
+    title: 'Shelf Sort',
+    tagline: 'Tap-to-move sorting puzzle on a 3D rack',
+    summary:
+      'Twelve items, four kinds, one empty shelf and fourteen moves. Tap an item, tap a free slot, '
+      + 'and get three of a kind onto one shelf to clear it. A different genre and a different '
+      + 'input from the runners — raycast taps instead of a swipe — on the same shared engine and '
+      + 'the same build pipeline.',
+    mechanics: [
+      'Tap an item, then tap a free slot. Free slots light up while something is in hand.',
+      'Three of a kind on one shelf clears it.',
+      'Every kind has its own shape as well as its own colour, so it reads without relying on hue.',
+      'The board is hand-authored, never shuffled: a random layout can be unsolvable.',
+    ],
+    playUrl: '/playables/sort-3d/index.html',
+    builtKb: 503,
+    gzipKb: 131,
+    fps: 60,
+    sourceLines: 1065,
+    tech: ['three.js', 'raycast picking', 'colour-blind safe shapes', 'WebAudio', 'Vite'],
+    networks: [
+      { label: 'Google Ads (App campaigns)', cta: 'ExitApi.exit()', limitMb: 5 },
+      { label: 'Unity Ads', cta: 'mraid.open()', limitMb: 5 },
+      { label: 'AppLovin', cta: 'mraid.open()', limitMb: 5 },
+      { label: 'ironSource', cta: 'dapi.openStoreUrl()', limitMb: 5 },
+      { label: 'Mintegral', cta: 'install()', limitMb: 3 },
+      { label: 'Meta', cta: 'FbPlayableAd.onCTAClick()', limitMb: 2 },
+    ],
+  },
 ]
 
 export interface UseGames {

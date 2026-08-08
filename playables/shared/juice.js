@@ -6,7 +6,6 @@ import {
   Points,
   PointsMaterial,
 } from 'three'
-import { CONFIG } from './config.js'
 import { createRadialTexture } from './textures.js'
 
 /** Ring buffer: two large bursts fit, and nothing is allocated while playing. */
@@ -25,8 +24,14 @@ function shakeNoise(time, seed) {
   return 0.6 * Math.sin(time * 1.1 + seed) + 0.4 * Math.sin(time * 2.3 + seed * 2)
 }
 
-/** Camera trauma, hit-stop and sparks. Never touches gameplay state. */
-export function createJuice(scene) {
+/**
+ * Camera trauma, hit-stop and sparks. Never touches gameplay state.
+ *
+ * `tiers` is the creative's `CONFIG.juice`: the small/medium/large presets plus
+ * traumaDecay, maxShake and maxRoll. Passing it in keeps this file free of any
+ * one creative's tuning.
+ */
+export function createJuice(scene, tiers) {
   /* Particles */
 
   const positions = new Float32Array(MAX_PARTICLES * 3)
@@ -79,7 +84,8 @@ export function createJuice(scene) {
 
       const angle = Math.random() * Math.PI * 2
 
-      // On a shell, not at the centre — sparks born inside the marble stay hidden.
+      // On a shell, not at the centre — sparks born inside the object that was
+      // hit spend their whole life hidden behind it.
       const radius = 0.3 + Math.random() * 0.22
       positions[slot * 3] = position.x + Math.cos(angle) * radius
       positions[slot * 3 + 1] = position.y + 0.12 + Math.random() * 0.3
@@ -146,14 +152,14 @@ export function createJuice(scene) {
       return
     }
 
-    trauma = Math.max(0, trauma - CONFIG.juice.traumaDecay * realDelta)
+    trauma = Math.max(0, trauma - tiers.traumaDecay * realDelta)
     // Squared: small events barely nudge the screen, big ones punch.
     const strength = trauma * trauma
     shakeTime += realDelta * 30
 
-    camera.position.x += CONFIG.juice.maxShake * strength * shakeNoise(shakeTime, 0)
-    camera.position.y += CONFIG.juice.maxShake * 0.7 * strength * shakeNoise(shakeTime, 1.7)
-    camera.rotation.z += CONFIG.juice.maxRoll * strength * shakeNoise(shakeTime, 3.1)
+    camera.position.x += tiers.maxShake * strength * shakeNoise(shakeTime, 0)
+    camera.position.y += tiers.maxShake * 0.7 * strength * shakeNoise(shakeTime, 1.7)
+    camera.rotation.z += tiers.maxRoll * strength * shakeNoise(shakeTime, 3.1)
   }
 
   /* Hit-stop */
@@ -169,7 +175,7 @@ export function createJuice(scene) {
 
   /** One call per event: the tier decides how hard everything hits. */
   function feedback(tier, position, color) {
-    const preset = CONFIG.juice[tier]
+    const preset = tiers[tier]
 
     // Trauma accumulates rather than resetting, so two quick hits read as one big one.
     trauma = Math.min(1, trauma + preset.trauma)

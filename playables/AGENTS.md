@@ -20,8 +20,9 @@ These are not preferences. Breaking one gets the creative rejected by a network.
 3. **No new dependencies.** three.js is the only runtime package. A physics
    engine, a tween library or a state manager each cost more than the feature
    they buy at this size.
-4. **Only `src/ads.js` may touch a network SDK.** No `mraid`, `dapi`,
-   `FbPlayableAd`, `gameStart` or `install` anywhere else in the source.
+4. **Only `shared/ads.js` may touch a network SDK.** No `mraid`, `dapi`,
+   `ExitApi`, `FbPlayableAd`, `gameStart` or `install` anywhere else — not in a
+   creative, not in the engine.
 5. **The creative must still play when the SDK is missing.** Every adapter needs
    a browser fallback. A creative that waits forever for an event that never
    fires is a blank ad.
@@ -107,21 +108,35 @@ and hides the impacts that matter. If in doubt, use the tier below.
 
 A change is not finished when it compiles. It is finished when:
 
-1. `npm run build` passes and the size table still fits every limit.
+1. `npm run build` passes — it exits non-zero if any build crosses a limit.
 2. The built file has been opened at a phone viewport (390×844 portrait **and**
    844×390 landscape) and actually played through — start, a hit, the endcard,
    replay.
 3. The frame rate held at 60 in that session and the SDK log shows no errors.
-4. If anything in `src/ads.js` changed, it has been run through `npm run
-   harness` in the **No ready**, **No SDK** and **Broken CTA** modes, and the
-   creative still plays in all three.
+4. If anything in `shared/` changed, **every** creative has been replayed — that
+   is the cost of a shared engine.
+5. If `shared/ads.js` changed, it has been run through `npm run harness` in the
+   **No ready**, **No SDK** and **Broken CTA** modes, and the creative still
+   plays in all three.
 
 Point 2 is the one that matters. A WebGL bug is invisible to every automated
 check in this project.
 
+## Where things live
+
+`shared/` is the engine: ad adapters, juice, collision, input, textures, audio.
+A change there lands in every creative, so it must stay free of any one
+creative's tuning — pass the numbers in, as `createJuice(scene, CONFIG.juice)`
+does.
+
+`creatives/<id>/` owns one creative: its scene, its rules, its `config.js`.
+It never owns an adapter, a build step or a collision routine.
+
+Adding a creative is a folder plus one line in `creatives.js`. Adding a network
+is one entry in `networks.js` plus one adapter object in `shared/ads.js`.
+
 ## Changing the campaign
 
-Store link, speeds, lives, obstacle count: `src/config.js`.
-Palette: `COLORS` in `src/level.js` plus the CSS variables in `src/style.css`.
-Endcard copy: `finish()` in `src/game.js`.
-A new network: one entry in `networks.js`, one adapter in `src/ads.js`.
+Store link, speeds, lives, board layout: `creatives/<id>/src/config.js`.
+Palette: the `COLORS` block in that creative plus its `style.css`.
+Endcard copy: `finish()` in its `game.js`.

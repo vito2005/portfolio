@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Shelf Sort</title>
+    <!-- Empty data URI: stops the WebView firing a stray /favicon.ico request. -->
+    <link rel="icon" href="data:," />
+    <!--
+      Google's HTML5 asset validator expects a `clickTag` global and flags any
+      creative without one. A playable clicks through MRAID or the Exit API, but
+      declaring it is free and some ad servers rewrite it to a tracking URL.
+    -->
+    <script>
+      var clickTag = 'https://play.google.com/store/apps/details?id=com.skywaylab.shelfsort'
+    </script>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <div id="ui">
+      <div id="hud">
+        <div class="stat"><span class="label">Moves</span><span id="moves">14</span></div>
+        <div class="stat"><span class="label">Sorted</span><span id="sorted">0/4</span></div>
+      </div>
+
+      <!-- Shown until the first tap; a playable must teach its control at a glance -->
+      <div id="tutorial">
+        <div id="hand"></div>
+        <p>Tap an item, then a free slot</p>
+      </div>
+
+      <div id="endcard" class="hidden">
+        <h1 id="endcard-title">All sorted!</h1>
+        <p id="endcard-text">Every shelf cleared</p>
+        <button id="cta" type="button">Play now</button>
+        <button id="replay" type="button">Try again</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
