@@ -1,5 +1,8 @@
 <template>
-  <div class="h-screen min-h-0 flex flex-col overflow-hidden bg-[#F9F8F6]">
+  <div
+    class="flex flex-col bg-[#F9F8F6]"
+    :class="scrollsWithDocument ? 'min-h-screen' : 'h-screen min-h-0 overflow-hidden'"
+  >
     <header class="border-b border-gray-200 sticky top-0 z-50 bg-[#F9F8F6]">
       <nav class="container mx-auto px-6 py-5">
         <div class="flex items-center justify-between">
@@ -50,6 +53,11 @@ const { getAllLessons } = useLessons()
 
 const allLessons = computed(() => getAllLessons())
 const selectedLessonId = computed(() => route.params.id || null)
+
+// Canvas lessons need the fixed h-screen box (that chain is what sizes the canvas).
+// Document-like pages opt in to normal page scroll, so the footer sits after the
+// content instead of being pinned to the bottom of the viewport.
+const scrollsWithDocument = computed(() => route.meta.scrollsWithDocument === true)
 
 const handleLessonSelect = (lesson) => {
   router.push(lesson.path)

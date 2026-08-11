@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 overflow-scroll">
+  <div class="container mx-auto">
     <div class="mb-10">
       <p class="text-xs font-semibold text-[#12b488] tracking-[0.2em] uppercase mb-3">Three.js</p>
       <h1 class="font-serif text-4xl sm:text-5xl text-gray-900">Examples</h1>
@@ -24,6 +24,7 @@ const router = useRouter()
 
 definePageMeta({
   layout: 'lessons',
+  scrollsWithDocument: true,
 })
 
 const { getAllLessons } = useLessons()
