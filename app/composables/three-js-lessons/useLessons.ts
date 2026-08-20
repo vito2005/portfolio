@@ -40,6 +40,14 @@ export const useLessons = () => {
             order: 24,
             path: '/lessons/24-environment-map',
             type: 'threejs'
+        },
+        {
+            id: '50',
+            title: 'Kinetic Text',
+            description: 'Extruded per-letter type that scatters on hover and springs back into the headline',
+            order: 50,
+            path: '/lessons/50-kinetic-text',
+            type: 'threejs'
         }
     ]
 
