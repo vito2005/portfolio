@@ -3,25 +3,27 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 
 /**
- * Kinetic text — a headline that lies flat until the pointer walks through it,
- * then tumbles out in 3D, shoves its neighbours aside and springs back onto the
- * baseline.
- *
- * The "flat at rest" half is not a second set of meshes. Every glyph is a real
- * extruded solid; what hides the extrusion at rest is colour, not geometry. A
- * letter's sides fade to the page background as it settles, so a sleeping glyph
- * is indistinguishable from flat type while a moving one shows solid colour.
- * Fading to the background rather than to transparency keeps every material
- * opaque — no transparent/opaque sorting to fight inside a two-group mesh.
+ * Kinetic text — a headline whose letters scatter when the pointer walks
+ * through them, shove their neighbours aside, and spring back into the line.
  *
  * Motion is a damped spring towards the rest transform rather than a rigid-body
  * world: it reproduces the reference (fly out, overshoot, settle) in a fraction
  * of the code, and — unlike real physics — a letter can never come to rest
- * anywhere but its own slot. Letter-on-letter contact is handled separately, as
- * circle collisions; see `resolveLetterCollisions`.
+ * anywhere but its own slot. Letter-on-letter contact is separate, as circle
+ * collisions; see `resolveLetterCollisions`.
+ *
+ * Two looks share that machinery, chosen with `appearance`:
+ *
+ * - `flat` — black face, palette-coloured sides that fade into the page as the
+ *   letter settles. The extrusion is real the whole time; what hides it at rest
+ *   is colour, not geometry, so a sleeping glyph is indistinguishable from
+ *   plain type. Fading to the background rather than to transparency keeps
+ *   every material opaque — no sorting to fight inside a two-group mesh.
+ * - `uniform` — one caller-supplied material (a matcap, say) on every face, so
+ *   the solid reads as a solid at all times, moving or not.
  */
 
-/** Faces the camera at rest, so the resting headline reads as plain black text. */
+/** Faces the camera at rest, so a resting `flat` headline reads as black type. */
 const FRONT_COLOR = '#111111'
 
 /** Only ever fully saturated while a letter is moving — this is the payoff. */
@@ -30,6 +32,16 @@ export const SIDE_PALETTE = ['#D64541', '#3B5BDB', '#E9B8B4', '#8FA99B', '#C08B5
 /** Coprime with the palette length, so neighbours never share a colour. */
 const PALETTE_STRIDE = 5
 
+export type KineticAppearance =
+    /** Sides carry palette colour in motion and sink into the page at rest. */
+    | { kind: 'flat', backgroundColor: string }
+    /**
+     * One material on every face, never recoloured. The material belongs to the
+     * caller and is deliberately *not* disposed with the text — it is usually
+     * shared with the rest of the scene.
+     */
+    | { kind: 'uniform', material: THREE.Material }
+
 export interface KineticTextOptions {
     size: number
     depth: number
@@ -37,10 +49,18 @@ export interface KineticTextOptions {
     lineHeight: number
     /** Extra tracking in world units, added to each glyph's advance width. */
     letterSpacing: number
-    /** Peak shadow opacity, reached at full travel. A resting letter casts none. */
-    shadowStrength: number
-    /** What a resting letter's sides fade into — must match the scene clear colour. */
-    backgroundColor: string
+    /**
+     * Rounded edges catch the light and are worth it under a matcap. The flat
+     * look must skip them: a chamfer reads as a coloured rim around the glyph
+     * even face-on, which gives the resting trick away.
+     */
+    bevel: boolean
+    appearance: KineticAppearance
+    /**
+     * Fake contact shadows, or `false` for none at all. They only make sense
+     * for a headline that sits on a baseline in the plane of the page.
+     */
+    shadow: { strength: number } | false
 }
 
 export interface KineticMotionParameters {
@@ -62,19 +82,19 @@ export interface KineticMotionParameters {
 
 export interface KineticLetter {
     mesh: THREE.Mesh
-    /** Per letter, not shared: its colour is animated independently. */
-    sideMaterial: THREE.MeshBasicMaterial
+    /** Only the `flat` look animates a side material; `uniform` leaves it null. */
+    sideMaterial: THREE.MeshBasicMaterial | null
     /** Page background — what the sides fade into at rest. */
-    restColor: THREE.Color
+    restColor: THREE.Color | null
     /** This letter's palette colour, worn at full travel. */
-    sideColor: THREE.Color
+    sideColor: THREE.Color | null
     /**
      * Invisible proxy the pointer ray hits. It tracks the letter's position but
      * never its rotation: a tumbling glyph turns edge-on twice per revolution,
      * and a hitbox that followed the spin would become impossible to hit there.
      */
     hitbox: THREE.Mesh
-    shadow: THREE.Mesh
+    shadow: THREE.Mesh | null
     restPosition: THREE.Vector3
     velocity: THREE.Vector3
     angularVelocity: THREE.Vector3
@@ -82,7 +102,7 @@ export interface KineticLetter {
     radius: number
     /** Base shadow footprint, spread out as the letter rises off the baseline. */
     shadowScale: THREE.Vector2
-    /** Peak opacity; the flight code scales this by travel and by height. */
+    /** Peak shadow opacity; the flight code scales it by travel and by height. */
     shadowStrength: number
     /** Only a moving letter is integrated; idle ones cost nothing per frame. */
     isFlying: boolean
@@ -151,7 +171,7 @@ export const createKineticText = (
     font: Font,
     options: KineticTextOptions,
 ): KineticText => {
-    const { size, depth, lineHeight, letterSpacing, backgroundColor, shadowStrength } = options
+    const { size, depth, lineHeight, letterSpacing, bevel, appearance, shadow } = options
     const { resolution } = font.data
 
     const entries: GlyphEntry[] = []
@@ -188,10 +208,11 @@ export const createKineticText = (
                 size,
                 depth,
                 curveSegments: 8,
-                // No bevel: a chamfer reads as a coloured rim around the glyph
-                // even face-on, which breaks the "flat text at rest" trick the
-                // whole effect rests on. A clean prism stays invisible.
-                bevelEnabled: false,
+                bevelEnabled: bevel,
+                bevelThickness: depth * 0.12,
+                bevelSize: depth * 0.08,
+                bevelOffset: 0,
+                bevelSegments: 3,
             })
 
             geometry.computeBoundingBox()
@@ -232,33 +253,42 @@ export const createKineticText = (
     const letters: KineticLetter[] = []
     const hitboxes: THREE.Mesh[] = []
 
-    const background = new THREE.Color(backgroundColor)
-    const frontMaterial = new THREE.MeshBasicMaterial({ color: FRONT_COLOR })
-    const shadowTexture = createShadowTexture()
-    const perLetterMaterials: THREE.Material[] = []
+    const isFlat = appearance.kind === 'flat'
+    const background = isFlat ? new THREE.Color(appearance.backgroundColor) : null
+    // Only the flat look owns materials; `uniform` borrows the caller's.
+    const frontMaterial = isFlat ? new THREE.MeshBasicMaterial({ color: FRONT_COLOR }) : null
+    const ownedMaterials: THREE.Material[] = frontMaterial ? [frontMaterial] : []
+    const shadowTexture = shadow ? createShadowTexture() : null
 
     // Shared across every letter — only the per-instance transform differs.
     const hitboxGeometry = new THREE.BoxGeometry(1, 1, 1)
-    const shadowGeometry = new THREE.PlaneGeometry(1, 1)
+    const shadowGeometry = shadow ? new THREE.PlaneGeometry(1, 1) : null
     // Shadows sit behind the glyphs rather than on a ground plane. A real floor
-    // is seen almost edge-on by this near-orthographic camera and collapses to
-    // a hairline; a squashed ellipse facing the camera reads at any angle.
+    // is seen almost edge-on by a near-orthographic camera and collapses to a
+    // hairline; a squashed ellipse facing the camera reads at any angle.
     const shadowZ = -depth * 2
 
     for (const [index, entry] of entries.entries()) {
-        const paletteColor = SIDE_PALETTE[(index * PALETTE_STRIDE) % SIDE_PALETTE.length]!
+        let sideMaterial: THREE.MeshBasicMaterial | null = null
+        let meshMaterial: THREE.Material | THREE.Material[]
 
-        // Starts at the background colour: every letter is born asleep.
-        const sideMaterial = new THREE.MeshBasicMaterial({ color: background })
-        perLetterMaterials.push(sideMaterial)
+        if (isFlat && frontMaterial && background) {
+            // Starts at the background colour: every letter is born asleep.
+            sideMaterial = new THREE.MeshBasicMaterial({ color: background })
+            ownedMaterials.push(sideMaterial)
+            // ExtrudeGeometry emits two groups: 0 = the flat caps, 1 = the sides.
+            meshMaterial = [frontMaterial, sideMaterial]
+        }
+        else {
+            meshMaterial = (appearance as { material: THREE.Material }).material
+        }
 
-        // ExtrudeGeometry emits two groups: 0 = the flat caps, 1 = the sides.
-        const mesh = new THREE.Mesh(entry.geometry, [frontMaterial, sideMaterial])
+        const mesh = new THREE.Mesh(entry.geometry, meshMaterial)
         const restPosition = new THREE.Vector3(entry.x, entry.y + offsetY, 0)
         mesh.position.copy(restPosition)
 
         // Raycaster ignores `visible`, so this tracks the glyph without drawing.
-        const hitbox = new THREE.Mesh(hitboxGeometry, frontMaterial)
+        const hitbox = new THREE.Mesh(hitboxGeometry, frontMaterial ?? undefined)
         hitbox.visible = false
         hitbox.position.copy(restPosition)
         hitbox.scale.set(entry.extent.x * 1.08, entry.extent.y * 1.08, Math.max(entry.extent.z, size))
@@ -270,37 +300,44 @@ export const createKineticText = (
         const radius = Math.min(entry.extent.x, entry.extent.y) * 0.5
 
         const shadowScale = new THREE.Vector2(entry.extent.x * 0.95, size * 0.26)
-        const shadowMaterial = new THREE.MeshBasicMaterial({
-            map: shadowTexture,
-            transparent: true,
-            depthWrite: false,
-            // Born asleep, and a sleeping letter casts no shadow — at rest the
-            // headline is nothing but flat type on the page.
-            opacity: 0,
-        })
-        perLetterMaterials.push(shadowMaterial)
+        let shadowMesh: THREE.Mesh | null = null
 
-        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial)
-        shadow.position.set(restPosition.x, floors[entry.lineIndex]!, shadowZ)
-        shadow.scale.set(shadowScale.x, shadowScale.y, 1)
-        // Draw before the glyphs so a settled letter never z-fights its shadow.
-        shadow.renderOrder = -1
+        if (shadow && shadowGeometry && shadowTexture) {
+            const shadowMaterial = new THREE.MeshBasicMaterial({
+                map: shadowTexture,
+                transparent: true,
+                depthWrite: false,
+                // Born asleep, and a sleeping letter casts no shadow — at rest
+                // the headline is nothing but flat type on the page.
+                opacity: 0,
+            })
+            ownedMaterials.push(shadowMaterial)
 
-        group.add(mesh, hitbox, shadow)
+            shadowMesh = new THREE.Mesh(shadowGeometry, shadowMaterial)
+            shadowMesh.position.set(restPosition.x, floors[entry.lineIndex]!, shadowZ)
+            shadowMesh.scale.set(shadowScale.x, shadowScale.y, 1)
+            // Draw before the glyphs so a settled letter never z-fights its shadow.
+            shadowMesh.renderOrder = -1
+            group.add(shadowMesh)
+        }
+
+        group.add(mesh, hitbox)
         hitboxes.push(hitbox)
         letters.push({
             mesh,
             sideMaterial,
             restColor: background,
-            sideColor: new THREE.Color(paletteColor),
+            sideColor: isFlat
+                ? new THREE.Color(SIDE_PALETTE[(index * PALETTE_STRIDE) % SIDE_PALETTE.length]!)
+                : null,
             hitbox,
-            shadow,
+            shadow: shadowMesh,
             restPosition,
             velocity: new THREE.Vector3(),
             angularVelocity: new THREE.Vector3(),
             radius,
             shadowScale,
-            shadowStrength,
+            shadowStrength: shadow ? shadow.strength : 0,
             isFlying: false,
         })
     }
@@ -317,7 +354,9 @@ export const createKineticText = (
         bounds,
         setShadowsVisible: (visible: boolean) => {
             for (const letter of letters) {
-                letter.shadow.visible = visible
+                if (letter.shadow) {
+                    letter.shadow.visible = visible
+                }
             }
         },
         setShadowStrength: (strength: number) => {
@@ -333,27 +372,50 @@ export const createKineticText = (
             for (const entry of entries) {
                 entry.geometry.dispose()
             }
-            for (const material of perLetterMaterials) {
+            for (const material of ownedMaterials) {
                 material.dispose()
             }
 
             hitboxGeometry.dispose()
-            shadowGeometry.dispose()
-            frontMaterial.dispose()
-            shadowTexture.dispose()
+            shadowGeometry?.dispose()
+            shadowTexture?.dispose()
         },
     }
+}
+
+/**
+ * Frames the headline and sizes the clip planes to match.
+ *
+ * A narrow FOV pushes the camera far back, and fixed 0.1/100 clip planes then
+ * either clip a large glyph size outright or waste the whole depth buffer on
+ * empty space, so both scale with the framing distance.
+ */
+export const fitCameraToBounds = (
+    camera: THREE.PerspectiveCamera,
+    bounds: THREE.Box3,
+    margin: number,
+): void => {
+    const extent = bounds.getSize(new THREE.Vector3())
+    const halfFov = THREE.MathUtils.degToRad(camera.fov) / 2
+    const distanceForHeight = extent.y / 2 / Math.tan(halfFov)
+    const distanceForWidth = extent.x / 2 / (Math.tan(halfFov) * camera.aspect)
+    const distance = Math.max(distanceForHeight, distanceForWidth) * margin + extent.z
+
+    camera.near = distance * 0.05
+    camera.far = distance * 6
+    camera.updateProjectionMatrix()
+    camera.position.set(0, 0, distance)
+    camera.lookAt(0, 0, 0)
 }
 
 /**
  * Kicks a letter out of its slot, away from wherever the pointer touched it.
  *
  * The forced +Z component matters: a letter shoved straight sideways stays
- * edge-on and the coloured extrusion never becomes visible.
+ * edge-on and the extrusion never becomes visible.
  *
  * Safe to call on a letter that is already in flight — the caller decides when
- * that happens, and the speed clamp keeps repeat hits from compounding into a
- * letter that shoots off screen.
+ * that happens, and `updateKineticLetters` caps the resulting speed.
  */
 export const knockLetter = (
     letter: KineticLetter,
@@ -520,26 +582,31 @@ export const updateKineticLetters = (
 
         const distance = letter.mesh.position.distanceTo(letter.restPosition)
 
-        // Colour tracks motion, and takes the max of two cues on purpose:
-        // speed alone would blink out at the top of the arc where the letter is
-        // momentarily still, and travel alone would lag behind the initial hit.
+        // How "in motion" the letter reads, and it takes the max of two cues on
+        // purpose: speed alone would blink out at the top of the arc where the
+        // letter is momentarily still, and travel alone would lag the first hit.
         const speedCue = letter.velocity.length() / (parameters.impulse * 0.35)
         const travelCue = distance / (settleRadius * 0.5)
         const ink = Math.min(Math.max(speedCue, travelCue), 1)
-        letter.sideMaterial.color.lerpColors(letter.restColor, letter.sideColor, ink)
 
-        // Only x tracks the glyph: y is the line's floor and z keeps the shadow
-        // behind the text, so a letter flying at the camera doesn't drag it out.
-        letter.shadow.position.x = letter.mesh.position.x
+        if (letter.sideMaterial && letter.restColor && letter.sideColor) {
+            letter.sideMaterial.color.lerpColors(letter.restColor, letter.sideColor, ink)
+        }
 
-        const height = letter.mesh.position.y - letter.shadow.position.y
-        const spread = 1 + Math.max(height, 0) * 0.22
-        letter.shadow.scale.set(letter.shadowScale.x * spread, letter.shadowScale.y * spread, 1)
-        const shadowMaterial = letter.shadow.material as THREE.MeshBasicMaterial
-        // Same `ink` cue as the sides: the shadow arrives with the movement and
-        // is gone by the time the letter is home. Divided by spread² on top, so
-        // a letter lifted off the baseline throws a wider, fainter blob.
-        shadowMaterial.opacity = (letter.shadowStrength * ink) / spread ** 2
+        if (letter.shadow) {
+            // Only x tracks the glyph: y is the line's floor and z keeps the
+            // shadow behind the text, so a letter flying at the camera does not
+            // drag it out of the page.
+            letter.shadow.position.x = letter.mesh.position.x
+
+            const height = letter.mesh.position.y - letter.shadow.position.y
+            const spread = 1 + Math.max(height, 0) * 0.22
+            letter.shadow.scale.set(letter.shadowScale.x * spread, letter.shadowScale.y * spread, 1)
+            // Same `ink` cue as the sides: the shadow arrives with the movement
+            // and is gone by the time the letter is home.
+            const shadowMaterial = letter.shadow.material as THREE.MeshBasicMaterial
+            shadowMaterial.opacity = (letter.shadowStrength * ink) / spread ** 2
+        }
 
         // Loose thresholds on purpose: 0.004 world units is well under a pixel
         // at this camera distance, and a tighter test leaves letters awake for
@@ -554,11 +621,17 @@ export const updateKineticLetters = (
             letter.mesh.quaternion.identity()
             letter.velocity.set(0, 0, 0)
             letter.angularVelocity.set(0, 0, 0)
-            letter.shadow.position.x = letter.restPosition.x
-            letter.shadow.scale.set(letter.shadowScale.x, letter.shadowScale.y, 1)
-            shadowMaterial.opacity = 0
+
             // Land exactly on the background, not a hair short of it.
-            letter.sideMaterial.color.copy(letter.restColor)
+            if (letter.sideMaterial && letter.restColor) {
+                letter.sideMaterial.color.copy(letter.restColor)
+            }
+            if (letter.shadow) {
+                letter.shadow.position.x = letter.restPosition.x
+                letter.shadow.scale.set(letter.shadowScale.x, letter.shadowScale.y, 1)
+                ;(letter.shadow.material as THREE.MeshBasicMaterial).opacity = 0
+            }
+
             letter.isFlying = false
         }
     }

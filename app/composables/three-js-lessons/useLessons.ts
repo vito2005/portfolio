@@ -48,6 +48,14 @@ export const useLessons = () => {
             order: 50,
             path: '/lessons/50-kinetic-text',
             type: 'threejs'
+        },
+        {
+            id: '51',
+            title: 'Kinetic Matcap Text',
+            description: 'The same scatter-and-settle motion on matcap-shaded type that stays solid at rest',
+            order: 51,
+            path: '/lessons/51-kinetic-matcap',
+            type: 'threejs'
         }
     ]
 

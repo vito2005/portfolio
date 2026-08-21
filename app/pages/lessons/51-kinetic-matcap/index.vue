@@ -3,9 +3,9 @@
     <canvas ref="canvasRef" class="w-full h-full outline-none touch-none" />
     <div
       v-if="isLoading"
-      class="absolute inset-0 flex items-center justify-center bg-[#F9F8F6] text-sm text-gray-400"
+      class="absolute inset-0 flex items-center justify-center bg-black text-sm text-gray-400"
     >
-      Loading font…
+      Loading…
     </div>
   </div>
 </template>
@@ -33,9 +33,9 @@ const route = useRoute()
 const url = useRequestURL()
 const canonicalUrl = url.origin + route.path
 
-const seoTitle = 'Kinetic Text — Three.js Lesson | Alex Buki Developer'
+const seoTitle = 'Kinetic Matcap Text — Three.js Lesson | Alex Buki Developer'
 const seoDescription
-  = 'Interactive kinetic typography with Three.js: extruded per-letter geometry, pointer raycasting and spring physics that knock letters out of the headline and settle them back.'
+  = 'Matcap-shaded 3D text that scatters under the pointer: per-letter TextGeometry, raycasting, spring return and letter-on-letter collisions in Three.js.'
 
 useHead({
   title: seoTitle,
@@ -64,8 +64,11 @@ let renderer: THREE.WebGLRenderer | null = null
 let controls: OrbitControls | null = null
 let gui: GUI | null = null
 let kineticText: KineticText | null = null
+let letterMaterial: THREE.MeshMatcapMaterial | null = null
+let donutGeometry: THREE.TorusGeometry | null = null
 let disposeLesson: (() => void) | null = null
 let detachListeners: (() => void) | null = null
+const matcapTextures: (THREE.Texture | null)[] = new Array(8).fill(null)
 
 type FontName = 'Sora' | 'Helvetiker'
 
@@ -79,41 +82,32 @@ const fonts: Record<FontName, Font | null> = {
   Helvetiker: null,
 }
 
-/** Multiple of the glyph size — the reference headline sits fairly tight. */
-const LINE_HEIGHT = 1.25
+/** Multiple of the glyph size. */
+const LINE_HEIGHT = 1.3
 
-/** The site's page colour. Resting letters fade their sides into it to vanish. */
-const PAGE_BACKGROUND = '#F9F8F6'
+/** Matches lesson 12's field of scattered torus knots. */
+const DONUT_COUNT = 100
 
 const parameters = {
   // lil-gui has no multiline input, so `|` stands in for a line break.
-  text: 'MADE TO|MOVE',
-  // Resting letters are flat because their sides are black, not because of the
-  // camera, so this can stay wide enough to give flying letters real depth.
-  fov: 14,
-  // Helvetiker, not the site's Sora: Sora's JSON carries near-duplicate points
-  // in a few glyphs (M is the obvious one) and TextGeometry's triangulation
-  // fills a wedge that isn't in the outline. Sora stays selectable in the GUI.
-  font: 'Helvetiker' as FontName,
-  size: 1,
-  depth: 0.22,
+  text: 'Alex Buki',
+  font: 'Sora' as FontName,
+  matcap: 8,
+  size: 0.8,
+  depth: 0.3,
   letterSpacing: 0.02,
-  // Tuned against the reference clip: a letter travels roughly 1.5x its own
-  // height, turns a bit over one full revolution, and is home inside ~1.2s.
-  // Amplitude is impulse / sqrt(stiffness), so those two move together.
-  impulse: 4.5,
-  lift: 2.2,
-  spin: 14,
-  stiffness: 8,
+  donuts: true,
+  // Softer than lesson 50's: this camera sits only a few units from the text,
+  // so the same impulse throws a letter clean out of frame. Amplitude is
+  // impulse / sqrt(stiffness) — both ends are tightened here.
+  impulse: 3.2,
+  lift: 1.4,
+  spin: 12,
+  stiffness: 11,
   damping: 1.6,
   flatten: 4,
-  // Letter-on-letter restitution. Low: glyphs shove each other aside and let
-  // the springs take over, rather than clacking around like billiard balls.
   bounce: 0.35,
-  // Peak shadow opacity, at full travel. Resting letters cast none at all.
-  shadowStrength: 0.85,
-  shadows: true,
-  orbit: false,
+  orbit: true,
 }
 
 onMounted(() => {
@@ -123,8 +117,6 @@ onMounted(() => {
     return
   }
 
-  // Hard vector edges against a flat background — this is the one scene here
-  // where MSAA is the difference between crisp and cheap-looking.
   const lesson = useLesson(canvasRef, containerRef, { antialias: true })
   const { camera, scene } = lesson
 
@@ -137,11 +129,14 @@ onMounted(() => {
   gui.domElement.style.top = '0'
   gui.domElement.style.right = '0'
 
-  scene.background = new THREE.Color(PAGE_BACKGROUND)
+  // Matcaps carry their own lighting, so the scene needs none — and a dark
+  // ground is what makes the baked highlights read.
+  scene.background = new THREE.Color('#111111')
 
-  // Well under the shared 75° default: a long lens keeps the headline's own
-  // proportions honest and stops outer letters from splaying toward the edges.
-  camera.fov = parameters.fov
+  // Wider than lesson 50's near-orthographic framing on purpose: here the
+  // solid is meant to look solid at all times, and perspective is what sells
+  // the depth of a letter that is simply sitting still.
+  camera.fov = 45
   camera.updateProjectionMatrix()
 
   controls.enabled = parameters.orbit
@@ -149,22 +144,21 @@ onMounted(() => {
   const raycaster = new THREE.Raycaster()
   const pointer = new THREE.Vector2()
   let isPointerOverCanvas = false
-  // Knocks are driven by pointer *movement*, never by the clock. Standing still
-  // must leave the scene alone: the ray is cast every frame, so without this a
-  // parked cursor would keep re-hitting whatever drifted back underneath it.
+  // Knocks are driven by pointer *movement*, never by the clock: the ray is
+  // cast every frame, so a parked cursor would otherwise keep re-hitting
+  // whatever drifted back underneath it.
   let hasPointerMoved = false
 
-  // Letters the ray was inside on the previous frame. Knocking on *entry* only
-  // is what makes a parked cursor behave: the ray tests every frame, so hitting
-  // on every hit would re-kick the same letter 60 times a second.
+  // Letters the ray was inside on the previous frame — knocking on entry only.
   let hoveredLetters = new Set<number>()
   let nextHoveredLetters = new Set<number>()
 
+  const donuts = new THREE.Group()
+  scene.add(donuts)
+
   const fitCameraToText = () => {
     if (kineticText) {
-      // Generous margin: knocked letters travel well past the headline's own
-      // box, and clipping them at the frame edge looks like a bug, not a limit.
-      fitCameraToBounds(camera, kineticText.bounds, 1.28)
+      fitCameraToBounds(camera, kineticText.bounds, 1.5)
       controls?.target.set(0, 0, 0)
       controls?.update()
     }
@@ -172,7 +166,7 @@ onMounted(() => {
 
   const rebuildText = () => {
     const font = fonts[parameters.font]
-    if (!font) {
+    if (!font || !letterMaterial) {
       return
     }
 
@@ -182,15 +176,49 @@ onMounted(() => {
       depth: parameters.depth,
       lineHeight: LINE_HEIGHT,
       letterSpacing: parameters.letterSpacing,
-      bevel: false,
-      appearance: { kind: 'flat', backgroundColor: PAGE_BACKGROUND },
-      shadow: { strength: parameters.shadowStrength },
+      // Rounded edges give the matcap a highlight to run along; without them
+      // the glyphs read as flat cut-outs even while tumbling.
+      bevel: true,
+      // One material on every face, never recoloured — the whole point here is
+      // that the solid stays a solid whether it is moving or not.
+      appearance: { kind: 'uniform', material: letterMaterial },
+      shadow: false,
     })
-    kineticText.setShadowsVisible(parameters.shadows)
     scene.add(kineticText.group)
 
     fitCameraToText()
     isLoading.value = false
+  }
+
+  const buildDonuts = () => {
+    if (!letterMaterial) {
+      return
+    }
+
+    donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 24, 48)
+
+    for (let index = 0; index < DONUT_COUNT; index += 1) {
+      const donut = new THREE.Mesh(donutGeometry, letterMaterial)
+      // A hollow shell, not a filled cube: the middle is where the text lives,
+      // and donuts spawned there would sit on top of the headline.
+      const radius = 5 + Math.random() * 5
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      const z = radius * Math.cos(phi)
+      donut.position.set(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.sin(phi) * Math.sin(theta),
+        // Folded behind the text plane. The camera frames the headline from
+        // only a few units away, so anything spawned in front of it lands
+        // between lens and subject and fills the screen with one blurry torus.
+        z > 1 ? -z : z,
+      )
+      donut.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0)
+      const scale = 0.4 + Math.random() * 0.8
+      donut.scale.setScalar(scale)
+
+      donuts.add(donut)
+    }
   }
 
   /**
@@ -225,7 +253,7 @@ onMounted(() => {
   canvas.addEventListener('pointermove', handlePointerMove)
   canvas.addEventListener('pointerdown', handlePointerMove)
   canvas.addEventListener('pointerleave', handlePointerLeave)
-  // Runs after useLesson's own resize listener, so camera.aspect is already current.
+  // Runs after useLesson's own resize listener, so camera.aspect is current.
   window.addEventListener('resize', handleResize)
 
   detachListeners = () => {
@@ -236,12 +264,62 @@ onMounted(() => {
   }
 
   /**
+   * Textures
+   */
+  const loadMatcap = (index: number) => {
+    lesson.textureLoader.load(`/textures/matcaps/${index + 1}.png`, (texture) => {
+      // A matcap is a colour map — leaving it linear washes the shading out.
+      texture.colorSpace = THREE.SRGBColorSpace
+      matcapTextures[index] = texture
+
+      if (parameters.matcap === index + 1 && letterMaterial) {
+        letterMaterial.matcap = texture
+        letterMaterial.needsUpdate = true
+      }
+    })
+  }
+
+  // The chosen matcap first: the scene cannot draw anything without it. The
+  // rest are only needed if the GUI asks for them, so they wait for the tick.
+  lesson.textureLoader.load(
+    `/textures/matcaps/${parameters.matcap}.png`,
+    (texture) => {
+      texture.colorSpace = THREE.SRGBColorSpace
+      matcapTextures[parameters.matcap - 1] = texture
+      letterMaterial = new THREE.MeshMatcapMaterial({ matcap: texture })
+      buildDonuts()
+      rebuildText()
+    },
+    undefined,
+    () => {
+      // A failed matcap must still clear the overlay, or it hangs forever.
+      isLoading.value = false
+    },
+  )
+
+  for (const name of Object.keys(FONT_URLS) as FontName[]) {
+    lesson.fontLoader.load(
+      FONT_URLS[name],
+      (font) => {
+        fonts[name] = font
+        if (parameters.font === name) {
+          rebuildText()
+        }
+      },
+      undefined,
+      () => {
+        isLoading.value = false
+      },
+    )
+  }
+
+  /**
    * GUI
    */
   const textFolder = gui.addFolder('Text')
   textFolder.add(parameters, 'text').name('Text ( | = line break)').onFinishChange(rebuildText)
   textFolder.add(parameters, 'font', Object.keys(FONT_URLS)).name('Font').onChange(rebuildText)
-  textFolder.add(parameters, 'size').min(0.4).max(2).step(0.05).name('Size').onFinishChange(rebuildText)
+  textFolder.add(parameters, 'size').min(0.3).max(1.6).step(0.05).name('Size').onFinishChange(rebuildText)
   textFolder.add(parameters, 'depth').min(0.05).max(0.8).step(0.01).name('Depth').onFinishChange(rebuildText)
   textFolder.add(parameters, 'letterSpacing').min(-0.1).max(0.4).step(0.01).name('Tracking').onFinishChange(rebuildText)
 
@@ -255,57 +333,52 @@ onMounted(() => {
   motionFolder.add(parameters, 'bounce').min(0).max(1).step(0.05).name('Bounce')
 
   const lookFolder = gui.addFolder('Look')
-  lookFolder.add(parameters, 'shadows').name('Shadows').onChange((value: boolean) => {
-    kineticText?.setShadowsVisible(value)
-  })
-  lookFolder.add(parameters, 'shadowStrength').min(0).max(1).step(0.05).name('Shadow strength').onChange((value: number) => {
-    kineticText?.setShadowStrength(value)
-  })
-  lookFolder.add(parameters, 'fov').min(2).max(40).step(1).name('Camera FOV').onChange((value: number) => {
-    camera.fov = value
-    camera.updateProjectionMatrix()
-    fitCameraToText()
+  lookFolder.add(parameters, 'matcap', matcapTextures.map((_, index) => index + 1))
+    .name('Matcap')
+    .onChange((value: number) => {
+      const texture = matcapTextures[value - 1]
+      if (texture && letterMaterial) {
+        letterMaterial.matcap = texture
+        letterMaterial.needsUpdate = true
+      }
+    })
+  lookFolder.add(parameters, 'donuts').name('Donuts').onChange((value: boolean) => {
+    donuts.visible = value
   })
   lookFolder.add(parameters, 'orbit').name('Orbit camera').onChange((value: boolean) => {
     if (controls) {
       controls.enabled = value
     }
   })
-  lookFolder.close()
-
-  for (const name of Object.keys(FONT_URLS) as FontName[]) {
-    lesson.fontLoader.load(
-      FONT_URLS[name],
-      (font) => {
-        fonts[name] = font
-        if (parameters.font === name) {
-          rebuildText()
-        }
-      },
-      undefined,
-      () => {
-        // A failed font must still clear the overlay, or it hangs forever.
-        isLoading.value = false
-      },
-    )
-  }
 
   /**
    * Animate
    */
   const clock = new THREE.Clock()
+  let hasQueuedMatcaps = false
 
   const tick = () => {
     // A backgrounded tab hands back a delta of several seconds on return; the
     // spring integrator would fling every letter off screen.
     const delta = Math.min(clock.getDelta(), 1 / 30)
 
+    // Deferred to after the first frame so the scene appears immediately
+    // instead of waiting on eight textures it may never need.
+    if (!hasQueuedMatcaps && letterMaterial) {
+      hasQueuedMatcaps = true
+      for (let index = 0; index < matcapTextures.length; index += 1) {
+        if (!matcapTextures[index]) {
+          loadMatcap(index)
+        }
+      }
+    }
+
     if (kineticText && isPointerOverCanvas && hasPointerMoved) {
       hasPointerMoved = false
       raycaster.setFromCamera(pointer, camera)
 
       // The hitboxes are invisible proxies riding along with each glyph —
-      // raycasting the real geometry would miss the counters of O and E.
+      // raycasting the real geometry would miss the counters of O and e.
       nextHoveredLetters.clear()
       for (const intersection of raycaster.intersectObjects(kineticText.hitboxes, false)) {
         const index = intersection.object.userData.letterIndex as number
@@ -348,7 +421,14 @@ onUnmounted(() => {
   detachListeners?.()
   gui?.destroy()
   controls?.dispose()
+  // The text borrows `letterMaterial`, so it disposes geometry only — the
+  // material and its textures are this page's to clean up.
   kineticText?.dispose()
+  donutGeometry?.dispose()
+  letterMaterial?.dispose()
+  for (const texture of matcapTextures) {
+    texture?.dispose()
+  }
   disposeLesson?.()
   renderer?.dispose()
 })
