@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@nuxt/image": "^1.11.0",
+    "cannon-es": "^0.20.0",
     "lil-gui": "^0.21.0",
     "nuxt": "^4.3.0",
     "three": "^0.182.0",

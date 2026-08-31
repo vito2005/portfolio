@@ -5,7 +5,9 @@ export default withNuxt(
   {
     // The playables have their own toolchain and their own AGENTS.md rules;
     // linting them with the Nuxt/Vue config only produces noise.
-    ignores: ["playables/**"],
+    // `20-physics-final` is a standalone Three.js Journey exercise with its own
+    // Vite setup, kept around as reference material rather than shipped.
+    ignores: ["playables/**", "20-physics-final/**"],
   },
   {
     // `games/` is a second Nuxt app. This config is generated from the root

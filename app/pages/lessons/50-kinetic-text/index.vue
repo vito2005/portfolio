@@ -103,7 +103,7 @@ const parameters = {
   // Amplitude is impulse / sqrt(stiffness), so those two move together.
   impulse: 4.5,
   lift: 2.2,
-  spin: 14,
+  spin: 6,
   stiffness: 8,
   damping: 1.6,
   flatten: 4,
@@ -248,7 +248,7 @@ onMounted(() => {
   const motionFolder = gui.addFolder('Motion')
   motionFolder.add(parameters, 'impulse').min(0).max(10).step(0.1).name('Impulse')
   motionFolder.add(parameters, 'lift').min(0).max(6).step(0.1).name('Lift')
-  motionFolder.add(parameters, 'spin').min(0).max(30).step(0.5).name('Spin')
+  motionFolder.add(parameters, 'spin').min(0).max(20).step(0.25).name('Spin from lever')
   motionFolder.add(parameters, 'stiffness').min(2).max(60).step(0.5).name('Stiffness')
   motionFolder.add(parameters, 'damping').min(0.2).max(12).step(0.1).name('Damping')
   motionFolder.add(parameters, 'flatten').min(0.5).max(20).step(0.5).name('Flatten')

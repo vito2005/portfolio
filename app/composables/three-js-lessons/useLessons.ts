@@ -56,6 +56,22 @@ export const useLessons = () => {
             order: 51,
             path: '/lessons/51-kinetic-matcap',
             type: 'threejs'
+        },
+        {
+            id: '52',
+            title: 'Falling Text',
+            description: 'The same letters under a rigid-body solver: knock one loose and the headline collapses into a pile',
+            order: 52,
+            path: '/lessons/52-falling-text',
+            type: 'threejs'
+        },
+        {
+            id: '53',
+            title: 'Kinetic Text with Physics',
+            description: 'Lesson 50 rebuilt on cannon-es: soft LockConstraints hold each letter to its slot',
+            order: 53,
+            path: '/lessons/53-kinetic-physics',
+            type: 'threejs'
         }
     ]
 
