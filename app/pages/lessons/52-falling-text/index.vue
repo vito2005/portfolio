@@ -18,6 +18,7 @@ import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type GUI from 'lil-gui'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { createPointerKnock } from '@/composables/three-js-lessons/pointerKnock'
 import { layoutGlyphs, type LaidOutGlyph } from '@/composables/three-js-lessons/kineticText'
 
 definePageMeta({
@@ -187,14 +188,9 @@ onMounted(() => {
     void hitSound.play()
   }
 
-  const raycaster = new THREE.Raycaster()
-  const pointer = new THREE.Vector2()
-  let isPointerOverCanvas = false
-  // Knocks follow pointer *movement*, never the clock: the ray is cast every
-  // frame, so a parked cursor would keep shoving whatever sits under it.
-  let hasPointerMoved = false
-  let hoveredLetters = new Set<number>()
-  let nextHoveredLetters = new Set<number>()
+  // Movement gating, knock-on-entry, hover memory: the pointer rules live
+  // once in the shared helper — see pointerKnock.ts.
+  const pointerKnock = createPointerKnock(canvas)
 
   hitboxGeometry = new THREE.BoxGeometry(1, 1, 1)
   const letterGroup = new THREE.Group()
@@ -393,41 +389,14 @@ onMounted(() => {
       letter.mesh.quaternion.set(0, 0, 0, 1)
       letter.hitbox.position.copy(letter.mesh.position)
     }
-    hoveredLetters.clear()
+    pointerKnock.forget()
   }
 
   parameters.reset = resetLetters
 
-  /**
-   * Pointer position is normalised against the canvas rect, not the window —
-   * the canvas is an inset box inside the lessons layout.
-   */
-  const handlePointerMove = (event: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
-    if (x !== pointer.x || y !== pointer.y) {
-      hasPointerMoved = true
-    }
-
-    pointer.set(x, y)
-    isPointerOverCanvas = true
-  }
-
-  const handlePointerLeave = () => {
-    isPointerOverCanvas = false
-    hoveredLetters.clear()
-  }
-
-  canvas.addEventListener('pointermove', handlePointerMove)
-  canvas.addEventListener('pointerdown', handlePointerMove)
-  canvas.addEventListener('pointerleave', handlePointerLeave)
 
   detachListeners = () => {
-    canvas.removeEventListener('pointermove', handlePointerMove)
-    canvas.removeEventListener('pointerdown', handlePointerMove)
-    canvas.removeEventListener('pointerleave', handlePointerLeave)
+    pointerKnock.dispose()
   }
 
   for (const name of Object.keys(FONT_URLS) as FontName[]) {
@@ -486,30 +455,14 @@ onMounted(() => {
     // burning a hundred sub-steps in one frame.
     const delta = Math.min(clock.getDelta(), 1 / 30)
 
-    if (isPointerOverCanvas && hasPointerMoved) {
-      hasPointerMoved = false
-      raycaster.setFromCamera(pointer, camera)
-
-      // Invisible boxes, not the glyphs: raycasting the real geometry would
-      // miss the counters of O and the gaps in E.
-      nextHoveredLetters.clear()
-      for (const intersection of raycaster.intersectObjects(letters.map(letter => letter.hitbox), false)) {
-        const index = intersection.object.userData.letterIndex as number
-        nextHoveredLetters.add(index)
-
-        const letter = letters[index]
-        if (letter && !hoveredLetters.has(index)) {
-          knockLetter(letter, intersection.point)
-        }
+    // Hitboxes, not glyphs: raycasting the real geometry would miss the
+    // counters of O and the gaps in E.
+    pointerKnock.update(camera, letters.map(letter => letter.hitbox), (index, point) => {
+      const letter = letters[index]
+      if (letter) {
+        knockLetter(letter, point)
       }
-
-      const previousHovered = hoveredLetters
-      hoveredLetters = nextHoveredLetters
-      nextHoveredLetters = previousHovered
-    }
-    else if (!isPointerOverCanvas && hoveredLetters.size > 0) {
-      hoveredLetters.clear()
-    }
+    })
 
     // Fixed 60 Hz internally, with up to 3 catch-up sub-steps. Feeding the raw
     // frame delta straight in would make the simulation frame-rate dependent.

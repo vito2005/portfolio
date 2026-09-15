@@ -17,6 +17,7 @@ import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type GUI from 'lil-gui'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { createPointerKnock } from '@/composables/three-js-lessons/pointerKnock'
 import {
   createKineticText,
   fitCameraToBounds,
@@ -141,17 +142,9 @@ onMounted(() => {
 
   controls.enabled = parameters.orbit
 
-  const raycaster = new THREE.Raycaster()
-  const pointer = new THREE.Vector2()
-  let isPointerOverCanvas = false
-  // Knocks are driven by pointer *movement*, never by the clock: the ray is
-  // cast every frame, so a parked cursor would otherwise keep re-hitting
-  // whatever drifted back underneath it.
-  let hasPointerMoved = false
-
-  // Letters the ray was inside on the previous frame — knocking on entry only.
-  let hoveredLetters = new Set<number>()
-  let nextHoveredLetters = new Set<number>()
+  // Movement gating, knock-on-entry, hover memory: the pointer rules live
+  // once in the shared helper — see pointerKnock.ts.
+  const pointerKnock = createPointerKnock(canvas)
 
   const donuts = new THREE.Group()
   scene.add(donuts)
@@ -221,45 +214,15 @@ onMounted(() => {
     }
   }
 
-  /**
-   * Pointer position is normalised against the canvas rect, not the window —
-   * the canvas is an inset box inside the lessons layout.
-   */
-  const handlePointerMove = (event: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
-    // Repeated events at the same coordinates are not movement.
-    if (x !== pointer.x || y !== pointer.y) {
-      hasPointerMoved = true
-    }
-
-    pointer.set(x, y)
-    isPointerOverCanvas = true
-  }
-
-  const handlePointerLeave = () => {
-    isPointerOverCanvas = false
-    // Forget what was under the cursor, so coming back in counts as a fresh
-    // entry rather than a letter that was "already hovered".
-    hoveredLetters.clear()
-  }
-
   const handleResize = () => {
     fitCameraToText()
   }
 
-  canvas.addEventListener('pointermove', handlePointerMove)
-  canvas.addEventListener('pointerdown', handlePointerMove)
-  canvas.addEventListener('pointerleave', handlePointerLeave)
   // Runs after useLesson's own resize listener, so camera.aspect is current.
   window.addEventListener('resize', handleResize)
 
   detachListeners = () => {
-    canvas.removeEventListener('pointermove', handlePointerMove)
-    canvas.removeEventListener('pointerdown', handlePointerMove)
-    canvas.removeEventListener('pointerleave', handlePointerLeave)
+    pointerKnock.dispose()
     window.removeEventListener('resize', handleResize)
   }
 
@@ -373,30 +336,17 @@ onMounted(() => {
       }
     }
 
-    if (kineticText && isPointerOverCanvas && hasPointerMoved) {
-      hasPointerMoved = false
-      raycaster.setFromCamera(pointer, camera)
-
-      // The hitboxes are invisible proxies riding along with each glyph —
-      // raycasting the real geometry would miss the counters of O and e.
-      nextHoveredLetters.clear()
-      for (const intersection of raycaster.intersectObjects(kineticText.hitboxes, false)) {
-        const index = intersection.object.userData.letterIndex as number
-        nextHoveredLetters.add(index)
-
-        // A letter already in flight is fair game; only re-entry gates the hit.
-        const letter = kineticText.letters[index]
-        if (letter && !hoveredLetters.has(index)) {
-          knockLetter(letter, intersection.point, parameters)
+    if (kineticText) {
+      const text = kineticText
+      // Hitboxes, not glyphs: raycasting the real geometry would miss the
+      // counters of O and E. A letter already in flight is fair game — the
+      // helper only gates on entry.
+      pointerKnock.update(camera, text.hitboxes, (index, point) => {
+        const letter = text.letters[index]
+        if (letter) {
+          knockLetter(letter, point, parameters)
         }
-      }
-
-      const previousHovered = hoveredLetters
-      hoveredLetters = nextHoveredLetters
-      nextHoveredLetters = previousHovered
-    }
-    else if (!isPointerOverCanvas && hoveredLetters.size > 0) {
-      hoveredLetters.clear()
+      })
     }
 
     if (kineticText) {

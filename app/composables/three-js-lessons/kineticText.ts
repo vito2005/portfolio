@@ -21,6 +21,15 @@ import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
  *   every material opaque — no sorting to fight inside a two-group mesh.
  * - `uniform` — one caller-supplied material (a matcap, say) on every face, so
  *   the solid reads as a solid at all times, moving or not.
+ *
+ * Map of the module, top to bottom:
+ * - `layoutGlyphs`            — text → one centred geometry per glyph
+ * - `createKineticText`       — glyphs → meshes, hitboxes, shadows
+ * - `fitCameraToBounds`       — camera framing shared by the lessons
+ * - `knockLetter`             — pointer impulse, spin derived from the lever arm
+ * - `resolveLetterCollisions` — circle contact between letters
+ * - `updateLetterAppearance` / `parkLetter` — how the motion *looks*
+ * - `updateKineticLetters`    — one frame: integrate → collide → settle
  */
 
 /** Faces the camera at rest, so a resting `flat` headline reads as black type. */
@@ -634,87 +643,126 @@ export const parkLetter = (letter: KineticLetter): void => {
     }
 }
 
-/** Integrates every letter currently in motion and parks the ones that settled. */
+/**
+ * Spring step for one flying letter: pulled home, damped, tumbling, and
+ * progressively flattened so it lands face-on.
+ */
+const integrateLetterSpring = (
+    letter: KineticLetter,
+    delta: number,
+    parameters: KineticMotionParameters,
+    settleRadius: number,
+): void => {
+    // Hooke's law towards the slot, then exponential drag — a damped oscillator
+    // whose only equilibrium is the letter's own place in the headline.
+    toRest.subVectors(letter.restPosition, letter.mesh.position)
+    letter.velocity.addScaledVector(toRest, parameters.stiffness * delta)
+    letter.velocity.multiplyScalar(Math.exp(-parameters.damping * delta))
+    letter.mesh.position.addScaledVector(letter.velocity, delta)
+
+    // Tumble decays at the same rate as travel: decaying it faster costs the
+    // full rotation that makes the letter read as a solid rather than a card,
+    // and the flattening below is what actually lands it face-on anyway.
+    letter.angularVelocity.multiplyScalar(Math.exp(-parameters.damping * delta))
+    spinEuler.set(
+        letter.angularVelocity.x * delta,
+        letter.angularVelocity.y * delta,
+        letter.angularVelocity.z * delta,
+    )
+    spinDelta.setFromEuler(spinEuler)
+    letter.mesh.quaternion.premultiply(spinDelta)
+
+    // Flattening ramps up as the letter comes home, so it lands face-on
+    // instead of freezing at whatever angle the spin left it.
+    const distance = toRest.length()
+    const settle = 1 - Math.min(distance / settleRadius, 1)
+    letter.mesh.quaternion.slerp(REST_QUATERNION, Math.min(settle * parameters.flatten * delta, 1))
+}
+
+/**
+ * Post-collision housekeeping for one flying letter: cap its speed, drag the
+ * hitbox along, repaint it by its motion, and park it once the motion is gone.
+ */
+const settleLetter = (
+    letter: KineticLetter,
+    parameters: KineticMotionParameters,
+    settleRadius: number,
+): void => {
+    // Contact resolution injects energy — both the positional push-apart and
+    // the restitution impulse — so a busy pointer can pump letters clean off
+    // screen over a few frames. One ceiling keeps travel bounded no matter how
+    // the speed was acquired.
+    letter.velocity.clampLength(0, parameters.impulse * 1.3)
+
+    // The hitbox rides along, so a letter can be hit again mid-flight.
+    letter.hitbox.position.copy(letter.mesh.position)
+
+    const distance = letter.mesh.position.distanceTo(letter.restPosition)
+
+    // How "in motion" the letter reads — the max of two cues on purpose: speed
+    // alone would blink out at the top of the arc where the letter is
+    // momentarily still, and travel alone would lag behind the first hit.
+    const speedCue = letter.velocity.length() / (parameters.impulse * 0.35)
+    const travelCue = distance / (settleRadius * 0.5)
+    updateLetterAppearance(letter, Math.min(Math.max(speedCue, travelCue), 1))
+
+    // Loose thresholds on purpose: 0.004 world units is well under a pixel at
+    // this camera distance, and a tighter test leaves letters awake for
+    // seconds, jittering imperceptibly.
+    const isStill = distance < 0.004
+        && letter.velocity.lengthSq() < 1e-4
+        && letter.mesh.quaternion.angleTo(REST_QUATERNION) < 0.01
+
+    if (isStill) {
+        parkLetter(letter)
+        letter.velocity.set(0, 0, 0)
+        letter.angularVelocity.set(0, 0, 0)
+        letter.isFlying = false
+    }
+}
+
+/**
+ * A single pass over the pairs cannot settle a cluster — resolving A–B
+ * disturbs B–C, and three letters shoved into the same spot stay overlapped
+ * for the frame. A few relaxation sweeps converge the whole pile, which is
+ * exactly what a physics engine's solver iterations are (cannon runs 10; for
+ * a dozen letters this is plenty).
+ *
+ * Safe to repeat: the restitution impulse fires only while a pair is still
+ * approaching, and the first sweep leaves it separating — so the extra sweeps
+ * refine positions without pumping energy into the system.
+ */
+const COLLISION_SWEEPS = 4
+
+/**
+ * One frame of motion, deliberately shaped like a physics engine's step so
+ * this and the cannon-es version of the lesson read alike:
+ *
+ * 1. every flying letter is integrated towards its slot;
+ * 2. flying letters shove their neighbours aside;
+ * 3. each one is repainted by its motion, and parked once it has none left.
+ *
+ * Idle letters cost nothing — `isFlying` is this module's sleep state.
+ */
 export const updateKineticLetters = (
     letters: KineticLetter[],
     delta: number,
     parameters: KineticMotionParameters,
     settleRadius: number,
 ): void => {
-    const velocityDecay = Math.exp(-parameters.damping * delta)
-    // Tumble bleeds off at the same rate as travel: decaying it faster costs
-    // the full rotation that makes the letter read as a solid rather than a
-    // card, and `flatten` below is what actually lands it face-on anyway.
-    const spinDecay = Math.exp(-parameters.damping * delta)
-
     for (const letter of letters) {
-        if (!letter.isFlying) {
-            continue
+        if (letter.isFlying) {
+            integrateLetterSpring(letter, delta, parameters, settleRadius)
         }
-
-        toRest.subVectors(letter.restPosition, letter.mesh.position)
-        letter.velocity.addScaledVector(toRest, parameters.stiffness * delta)
-        letter.velocity.multiplyScalar(velocityDecay)
-        letter.mesh.position.addScaledVector(letter.velocity, delta)
-
-        letter.angularVelocity.multiplyScalar(spinDecay)
-        spinEuler.set(
-            letter.angularVelocity.x * delta,
-            letter.angularVelocity.y * delta,
-            letter.angularVelocity.z * delta,
-        )
-        spinDelta.setFromEuler(spinEuler)
-        letter.mesh.quaternion.premultiply(spinDelta)
-
-        // Flattening ramps up as the letter comes home, so it lands face-on
-        // instead of freezing at whatever angle the spin left it.
-        const distance = toRest.length()
-        const settle = 1 - Math.min(distance / settleRadius, 1)
-        letter.mesh.quaternion.slerp(REST_QUATERNION, Math.min(settle * parameters.flatten * delta, 1))
     }
 
-    // After integration, before presentation: positions are final for this frame.
-    resolveLetterCollisions(letters, parameters)
-
-    // Contact resolution injects energy — both the positional push-apart and the
-    // restitution impulse — so a busy pointer can pump letters clean off screen
-    // over a few frames. One ceiling on the whole system keeps travel bounded
-    // no matter how the speed was acquired.
-    const maximumSpeed = parameters.impulse * 1.3
+    for (let sweep = 0; sweep < COLLISION_SWEEPS; sweep += 1) {
+        resolveLetterCollisions(letters, parameters)
+    }
 
     for (const letter of letters) {
-        if (!letter.isFlying) {
-            continue
-        }
-
-        letter.velocity.clampLength(0, maximumSpeed)
-
-        // The hitbox rides along, so a letter can be hit again mid-flight.
-        letter.hitbox.position.copy(letter.mesh.position)
-
-        const distance = letter.mesh.position.distanceTo(letter.restPosition)
-
-        // How "in motion" the letter reads, and it takes the max of two cues on
-        // purpose: speed alone would blink out at the top of the arc where the
-        // letter is momentarily still, and travel alone would lag the first hit.
-        const speedCue = letter.velocity.length() / (parameters.impulse * 0.35)
-        const travelCue = distance / (settleRadius * 0.5)
-        const ink = Math.min(Math.max(speedCue, travelCue), 1)
-
-        updateLetterAppearance(letter, ink)
-
-        // Loose thresholds on purpose: 0.004 world units is well under a pixel
-        // at this camera distance, and a tighter test leaves letters awake for
-        // seconds, jittering imperceptibly.
-        const isStill = distance < 0.004
-            && letter.velocity.lengthSq() < 1e-4
-            && letter.mesh.quaternion.angleTo(REST_QUATERNION) < 0.01
-
-        if (isStill) {
-            parkLetter(letter)
-            letter.velocity.set(0, 0, 0)
-            letter.angularVelocity.set(0, 0, 0)
-            letter.isFlying = false
+        if (letter.isFlying) {
+            settleLetter(letter, parameters, settleRadius)
         }
     }
 }

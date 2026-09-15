@@ -18,6 +18,7 @@ import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type GUI from 'lil-gui'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { createPointerKnock } from '@/composables/three-js-lessons/pointerKnock'
 import {
   createKineticText,
   fitCameraToBounds,
@@ -186,14 +187,9 @@ onMounted(() => {
     { friction: 0, restitution: parameters.bounce },
   )
 
-  const raycaster = new THREE.Raycaster()
-  const pointer = new THREE.Vector2()
-  let isPointerOverCanvas = false
-  // Knocks follow pointer *movement*, never the clock: the ray is cast every
-  // frame, so a parked cursor would keep shoving whatever sits under it.
-  let hasPointerMoved = false
-  let hoveredLetters = new Set<number>()
-  let nextHoveredLetters = new Set<number>()
+  // Movement gating, knock-on-entry, hover memory: the pointer rules live
+  // once in the shared helper — see pointerKnock.ts.
+  const pointerKnock = createPointerKnock(canvas)
 
   const applySpookParams = (constraint: CANNON.LockConstraint) => {
     // Every equation in a constraint carries its own SPOOK parameters, and a
@@ -294,41 +290,14 @@ onMounted(() => {
     isLoading.value = false
   }
 
-  /**
-   * Pointer position is normalised against the canvas rect, not the window —
-   * the canvas is an inset box inside the lessons layout.
-   */
-  const handlePointerMove = (event: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
-    if (x !== pointer.x || y !== pointer.y) {
-      hasPointerMoved = true
-    }
-
-    pointer.set(x, y)
-    isPointerOverCanvas = true
-  }
-
-  const handlePointerLeave = () => {
-    isPointerOverCanvas = false
-    hoveredLetters.clear()
-  }
-
   const handleResize = () => {
     fitCameraToText()
   }
 
-  canvas.addEventListener('pointermove', handlePointerMove)
-  canvas.addEventListener('pointerdown', handlePointerMove)
-  canvas.addEventListener('pointerleave', handlePointerLeave)
   window.addEventListener('resize', handleResize)
 
   detachListeners = () => {
-    canvas.removeEventListener('pointermove', handlePointerMove)
-    canvas.removeEventListener('pointerdown', handlePointerMove)
-    canvas.removeEventListener('pointerleave', handlePointerLeave)
+    pointerKnock.dispose()
     window.removeEventListener('resize', handleResize)
   }
 
@@ -443,27 +412,13 @@ onMounted(() => {
     // capping the catch-up keeps cannon from burning a hundred sub-steps.
     const delta = Math.min(clock.getDelta(), 1 / 30)
 
-    if (kineticText && isPointerOverCanvas && hasPointerMoved) {
-      hasPointerMoved = false
-      raycaster.setFromCamera(pointer, camera)
-
-      nextHoveredLetters.clear()
-      for (const intersection of raycaster.intersectObjects(kineticText.hitboxes, false)) {
-        const index = intersection.object.userData.letterIndex as number
-        nextHoveredLetters.add(index)
-
+    if (kineticText) {
+      pointerKnock.update(camera, kineticText.hitboxes, (index, point) => {
         const entry = bodies[index]
-        if (entry && !hoveredLetters.has(index)) {
-          knock(entry, intersection.point)
+        if (entry) {
+          knock(entry, point)
         }
-      }
-
-      const previousHovered = hoveredLetters
-      hoveredLetters = nextHoveredLetters
-      nextHoveredLetters = previousHovered
-    }
-    else if (!isPointerOverCanvas && hoveredLetters.size > 0) {
-      hoveredLetters.clear()
+      })
     }
 
     // Applied before the step, while the solver is still collecting forces.
