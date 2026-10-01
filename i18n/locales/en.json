@@ -6,7 +6,9 @@
     "about": "About",
     "contact": "Contact",
     "switch_locale": "Русская версия",
-    "menu": "Menu"
+    "menu": "Menu",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
   },
   "hero": {
     "eyebrow": "Alex Buki",
