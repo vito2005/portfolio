@@ -1,0 +1,30 @@
+# abuki.dev and games.abuki.dev run on the Timeweb server in St Petersburg:
+# the audience is mostly in Russia, where Railway's custom domains don't open.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # The key is restricted with command= in authorized_keys, so a plain ssh
+      # runs /opt/portfolio-deploy.sh (pull main, build both sites, restart)
+      # and nothing else: it cannot open a shell.
+      - name: Build and restart on the server
+        env:
+          DEPLOY_KEY: ${{ secrets.PORTFOLIO_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PORTFOLIO_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_ed25519 root@94.241.139.59

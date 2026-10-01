@@ -7,7 +7,6 @@
         <li><a :href="`mailto:${contacts.email}`" class="transition-colors hover:text-ink">{{ $t('contact.email') }}</a></li>
         <li><a :href="contacts.linkedin" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">LinkedIn</a></li>
         <li><a :href="contacts.github" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">GitHub</a></li>
-        <li><a :href="contacts.instagram" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">Instagram</a></li>
       </ul>
     </div>
   </footer>

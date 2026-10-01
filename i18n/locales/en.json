@@ -10,7 +10,7 @@
   },
   "hero": {
     "eyebrow": "Alex Buki",
-    "title": "Software engineer.",
+    "title": "Software engineer",
     "subtitle": "Full-stack with a front-end lean, plus interactive 3D.",
     "now": "Ex‑Mail.ru, now at the design studio {studio}.",
     "cta_projects": "View projects",
@@ -44,20 +44,17 @@
     "period": "Period",
     "side_project": "Side project",
     "back": "All projects",
-    "prev": "Previous project",
-    "next": "Next project",
     "open": "Open project",
     "not_found": "There is no project at this address.",
     "freelance": "Freelance"
   },
   "contact": {
-    "title": "Let's build something together",
+    "title": "Have an idea? Let's ship it.",
     "text": "Open to senior roles, contract work and consulting. English and Russian.",
     "email": "Email",
     "telegram": "Telegram",
     "linkedin": "LinkedIn",
-    "github": "GitHub",
-    "instagram": "Instagram"
+    "github": "GitHub"
   },
   "lab": {
     "title": "Lab",

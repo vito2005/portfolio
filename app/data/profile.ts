@@ -7,8 +7,6 @@ export const contacts = {
   linkedin: 'https://www.linkedin.com/in/aleksandr-buki',
   github: 'https://github.com/vito2005',
   githubHandle: 'vito2005',
-  instagram: 'https://www.instagram.com/bukialex',
-  instagramHandle: '@bukialex',
 }
 
 /** About section on the home page: one line on what I do, then three proof points. */

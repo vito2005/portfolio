@@ -57,23 +57,11 @@
         </div>
       </aside>
     </div>
-
-    <nav class="mt-16 flex flex-wrap justify-between gap-4 border-t border-line pt-8 text-sm" :aria-label="$t('projects.title')">
-      <NuxtLink v-if="previous" :to="localePath(`/projects/${previous.slug}`)" class="link text-ink">
-        <span class="block text-ink-mute">{{ $t('projects.prev') }}</span>
-        {{ previous.title }}
-      </NuxtLink>
-      <span v-else />
-      <NuxtLink v-if="next" :to="localePath(`/projects/${next.slug}`)" class="link text-right text-ink">
-        <span class="block text-ink-mute">{{ $t('projects.next') }}</span>
-        {{ next.title }}
-      </NuxtLink>
-    </nav>
   </article>
 </template>
 
 <script setup lang="ts">
-import { findProject, projectOriginKey, projects } from '@/data/projects'
+import { findProject, projectOriginKey } from '@/data/projects'
 
 const route = useRoute()
 const localePath = useLocalePath()
@@ -85,9 +73,6 @@ if (!project) {
   throw createError({ statusCode: 404, statusMessage: t('projects.not_found') })
 }
 
-const position = projects.indexOf(project)
-const previous = projects[position - 1]
-const next = projects[position + 1]
 
 const blocks = computed(() => [
   { title: t('projects.problem'), text: pick(project.problem) },

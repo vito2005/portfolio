@@ -126,6 +126,7 @@ const lessons = HOME_LESSON_IDS
 
 usePageSeo({
   title: 'Alex Buki - Software Engineer',
-  description: [t('hero.title'), t('hero.subtitle'), t('hero.now', { studio: 'Vide Infra' })].join(' '),
+  // The visible title has no full stop; the meta description needs one between sentences.
+  description: [`${t('hero.title')}.`, t('hero.subtitle'), t('hero.now', { studio: 'Vide Infra' })].join(' '),
 })
 </script>
