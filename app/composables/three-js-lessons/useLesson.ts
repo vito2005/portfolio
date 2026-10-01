@@ -11,6 +11,11 @@ export interface LessonOptions {
      * colours) do — jaggies are the whole difference there.
      */
     antialias?: boolean
+    /**
+     * Transparent canvas, so the page background shows through. Off for
+     * lessons (they paint their own backdrop), on for the home-page avatar.
+     */
+    alpha?: boolean
 }
 
 export const useLesson = (
@@ -72,6 +77,7 @@ export const useLesson = (
     const renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: options.antialias ?? false,
+        alpha: options.alpha ?? false,
     })
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))

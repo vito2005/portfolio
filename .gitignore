@@ -33,3 +33,6 @@ logs
 # Screenshots from local debugging (real assets live in public/ and app/assets)
 /*.png
 /*.jpg
+
+# Python bytecode from the Blender scripts in tools/
+__pycache__/

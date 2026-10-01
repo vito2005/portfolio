@@ -1,13 +1,23 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxtjs/tailwindcss', '@nuxtjs/i18n'],
+  i18n: {
+    locales: [
+      { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'ru', language: 'ru-RU', name: 'Русский', file: 'ru.json' },
+    ],
+    defaultLocale: 'en',
+    // English lives at the bare URL, Russian under /ru. No browser-language
+    // redirect: a recruiter who opens the link must land on the page they were sent.
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: false,
+  },
   app: {
     head: {
       title: 'Alex Buki - Software Engineer',
       meta: [
-        { name: 'description', content: 'Alex Buki Portfolio' },
-
+        { name: 'description', content: 'Software engineer for interactive 3D and the whole product front end.' },
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
@@ -44,4 +54,9 @@ export default defineNuxtConfig({
     currencyKey: process.env.CURRENCY_API_KEY
   },
   css: ['~/assets/css/tailwind.css'],
+  // The About page became a section of the home page; keep shared links working.
+  routeRules: {
+    '/about': { redirect: { to: '/#about', statusCode: 301 } },
+    '/ru/about': { redirect: { to: '/ru#about', statusCode: 301 } },
+  },
 })

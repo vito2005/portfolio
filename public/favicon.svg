@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4ade80;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#166534;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <circle cx="16" cy="16" r="16" fill="url(#grad)"/>
-  <text x="16" y="21" fill="white" font-family="sans-serif" font-weight="900" font-size="16" text-anchor="middle">AB</text>
+  <!-- A.B. monogram (app/components/SiteLogo.vue) in paper on an ink tile, so it reads on light and dark tabs. -->
+  <rect width="32" height="32" rx="7" fill="#111111"/>
+  <g transform="translate(3.5 9.5) scale(0.1289)">
+    <g transform="translate(-28 -16)">
+      <path fill="#F9F8F6" fill-rule="evenodd" d="M28 111 L55 111 L117 44 L118 115 L196 115 L203 113 L216 103 L222 88 L221 77 L218 71 L212 64 L204 59 L207 56 L210 47 L208 32 L200 22 L187 16 L114 16 L28 111 Z M140 36 L185 36 L190 44 L185 53 L181 55 L153 55 L153 73 L195 74 L199 77 L202 83 L200 91 L193 96 L141 96 Z M105.5 72.5 L75 105.5 L105.5 105.5 Z"/>
+      <path fill="#12b488" d="M105.5 72.5 L75 105.5 H105.5 Z"/>
+    </g>
+  </g>
 </svg>

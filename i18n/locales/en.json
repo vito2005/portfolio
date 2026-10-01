@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "lab": "Lab",
+    "about": "About",
+    "contact": "Contact",
+    "switch_locale": "Русская версия",
+    "menu": "Menu"
+  },
+  "hero": {
+    "eyebrow": "Alex Buki",
+    "title": "Software engineer.",
+    "subtitle": "Full-stack with a front-end lean, plus interactive 3D.",
+    "now": "Ex‑Mail.ru, now at the design studio {studio}.",
+    "cta_projects": "View projects",
+    "cta_contact": "Contact",
+    "avatar_alt": "Animated 3D avatar of Alex waving",
+    "stack_label": "Main technologies"
+  },
+  "home": {
+    "projects_title": "Selected projects",
+    "projects_all": "All projects",
+    "about_title": "About",
+    "experience_title": "Where I have worked",
+    "lab_title": "Lab",
+    "lab_text": "Three.js experiments from the Bruno Simon course and my own: kinetic type, physics, lighting, environment maps. Rough by design, this is where the 3D work gets practiced.",
+    "lab_all": "Open the lab",
+    "channels": "I also run a channel on {telegram} and {youtube}.",
+    "experience_early": "{years}: full-stack work in product teams, Node and Vue."
+  },
+  "projects": {
+    "title": "Projects",
+    "intro": "Products I have led or built, and side projects that became real. Each one lists the problem, what I did and what came out of it.",
+    "work": "Client and company work",
+    "side": "Side projects",
+    "problem": "Problem",
+    "work_done": "What I did",
+    "result": "Result",
+    "stack": "Stack",
+    "links": "Links",
+    "role": "Role",
+    "company": "Company",
+    "period": "Period",
+    "side_project": "Side project",
+    "back": "All projects",
+    "prev": "Previous project",
+    "next": "Next project",
+    "open": "Open project",
+    "not_found": "There is no project at this address.",
+    "freelance": "Freelance"
+  },
+  "contact": {
+    "title": "Let's build something together",
+    "text": "Open to senior roles, contract work and consulting. English and Russian.",
+    "email": "Email",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "instagram": "Instagram"
+  },
+  "lab": {
+    "title": "Lab",
+    "subtitle": "Three.js experiments. Some follow the Bruno Simon course, the later ones are my own.",
+    "select": "Choose an experiment",
+    "experiment": "Experiment",
+    "open": "Open"
+  }
+}

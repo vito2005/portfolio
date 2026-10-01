@@ -5,6 +5,12 @@ export interface Lesson {
     order: number
     path: string
     type: 'threejs' | 'other'
+    /**
+     * Short muted loop for the Lab tile, path without extension
+     * (`/videos/lab-50` → lab-50.webm + lab-50.mp4). A still frame can't show
+     * that a scene moves; the tile image stays as the fallback.
+     */
+    video?: string
 }
 
 export const useLessons = () => {
@@ -15,7 +21,8 @@ export const useLessons = () => {
             description: 'Creating and using materials in Three.js',
             order: 11,
             path: '/lessons/11-materials',
-            type: 'threejs'
+            type: 'threejs',
+            video: '/videos/lab-11'
         },
         {
             id: '12',
@@ -23,7 +30,8 @@ export const useLessons = () => {
             description: 'Creating 3D text with Three.js',
             order: 12,
             path: '/lessons/12-text',
-            type: 'threejs'
+            type: 'threejs',
+            video: '/videos/lab-12'
         },
         {
             id: '16',
@@ -31,7 +39,8 @@ export const useLessons = () => {
             description: 'Building a haunted house scene with textures, lights, shadows and fog',
             order: 16,
             path: '/lessons/16-haunted-house',
-            type: 'threejs'
+            type: 'threejs',
+            video: '/videos/lab-16'
         },
         {
             id: '24',
@@ -39,7 +48,8 @@ export const useLessons = () => {
             description: 'Environment maps and HDR lighting in Three.js',
             order: 24,
             path: '/lessons/24-environment-map',
-            type: 'threejs'
+            type: 'threejs',
+            video: '/videos/lab-24'
         },
         {
             id: '50',
@@ -47,7 +57,8 @@ export const useLessons = () => {
             description: 'Extruded per-letter type that scatters on hover and springs back into the headline',
             order: 50,
             path: '/lessons/50-kinetic-text',
-            type: 'threejs'
+            type: 'threejs',
+            video: '/videos/lab-50'
         }
     ]
 

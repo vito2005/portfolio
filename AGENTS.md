@@ -14,8 +14,7 @@ npm start          # what Railway runs: node .output/server/index.mjs
 ```
 
 `npm run lint` is the **only** check in this repo — there are no unit tests, no
-`typecheck` script, and no CI. Baseline is 0 errors / a handful of
-`vue/html-self-closing` warnings in `PoweredBy.vue`; don't add new errors.
+`typecheck` script, and no CI. Baseline is 0 errors / 0 warnings; keep it there.
 
 Because nothing else verifies behaviour: **a Three.js change is not "done" until
 the scene has actually been rendered in a browser.** Run `npm run dev`, open the
