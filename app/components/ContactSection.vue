@@ -1,6 +1,6 @@
 <template>
   <section id="contact" class="scroll-mt-20">
-    <h2 class="max-w-[12ch] font-serif text-5xl leading-[1.02] tracking-tight text-ink sm:text-6xl lg:text-7xl">{{ $t('contact.title') }}</h2>
+    <h2 class="whitespace-pre-line font-serif text-5xl leading-[1.02] tracking-tight text-ink sm:text-6xl lg:text-7xl">{{ $t('contact.title') }}</h2>
     <p class="mt-6 max-w-[60ch] leading-relaxed text-ink-soft">{{ $t('contact.text') }}</p>
     <ul class="mt-8 flex flex-wrap gap-3 sm:gap-4">
       <li v-for="item in items" :key="item.href">
@@ -38,8 +38,8 @@
 <script setup lang="ts">
 import { contacts } from '@/data/profile'
 
-// The closing call to action: a display-size title on two lines, larger than the
-// other section titles on purpose, so the page ends on it.
+// The closing call to action: a display-size title, larger than the other section
+// titles on purpose, so the page ends on it. Line breaks come from the copy (\n).
 const { t } = useI18n()
 
 /**
