@@ -2,7 +2,7 @@
   <div class="page">
     <section class="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-12 lg:gap-12">
       <div class="lg:col-span-7">
-        <p class="rise text-xs font-medium uppercase tracking-[0.18em] text-accent-deep">{{ $t('hero.eyebrow') }}</p>
+        <p class="rise text-xs font-medium uppercase tracking-[0.18em] text-accent-ink">{{ $t('hero.eyebrow') }}</p>
         <h1 class="rise mt-4 font-serif text-[8.6vw] leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem] xl:text-[3.6rem]">
           {{ $t('hero.title') }}
         </h1>

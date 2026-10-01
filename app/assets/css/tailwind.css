@@ -28,8 +28,9 @@
 }
 
 @layer components {
+  /* Ink on the bright accent: 7.1:1. White on it was 2.65:1, below WCAG AA. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-deep active:translate-y-px;
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-accent-deep active:translate-y-px;
   }
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-line px-5 py-2.5 text-sm font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink active:translate-y-px;

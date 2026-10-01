@@ -8,7 +8,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-5">
             <NuxtLink to="/" class="font-serif italic text-xl text-gray-900 tracking-tight">A.B.</NuxtLink>
-            <span class="text-gray-300">|</span>
+            <span class="text-gray-300" aria-hidden="true">|</span>
             <NuxtLink to="/lessons" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Examples</NuxtLink>
           </div>
           <Dropdown
@@ -34,7 +34,7 @@
       <slot />
     </main>
     <footer class="border-t border-gray-200">
-      <div class="container mx-auto px-6 py-4 flex gap-6 text-xs text-gray-400">
+      <div class="container mx-auto px-6 py-4 flex gap-6 text-xs text-ink-mute">
         <NuxtLink to="/" class="hover:text-gray-700 transition-colors">Home</NuxtLink>
         <NuxtLink to="/lessons" class="hover:text-gray-700 transition-colors">Examples</NuxtLink>
       </div>

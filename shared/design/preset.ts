@@ -18,6 +18,8 @@ export default {
           DEFAULT: '#12b488',
           deep: '#0e9a74', // hover / pressed state of the accent
           soft: '#e3f5ee', // accent-tinted background for chips and highlights
+          // Green for small text: the bright accent is only 2.5:1 on paper, this is 5.0:1 (WCAG AA).
+          ink: '#0a7a5b',
         },
         paper: {
           DEFAULT: '#F9F8F6',
@@ -28,7 +30,7 @@ export default {
         ink: {
           DEFAULT: '#111111',
           soft: '#4A4946', // secondary text
-          mute: '#807D77', // captions, meta, placeholders (AA on paper)
+          mute: '#6E6B65', // captions, meta, placeholders: 5.0:1 on paper, 4.6:1 on paper-deep (AA)
         },
       },
       fontFamily: {
