@@ -38,6 +38,10 @@
               :class="isMenuOpen ? 'translate-y-[6px] rotate-45' : ''"
             />
             <span
+              class="absolute left-0 top-[6px] h-0.5 w-5 rounded-full bg-current transition-opacity duration-150"
+              :class="isMenuOpen ? 'opacity-0' : ''"
+            />
+            <span
               class="absolute bottom-0 left-0 h-0.5 w-5 rounded-full bg-current transition-transform duration-200"
               :class="isMenuOpen ? '-translate-y-[6px] -rotate-45' : ''"
             />
