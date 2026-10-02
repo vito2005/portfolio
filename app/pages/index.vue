@@ -125,7 +125,7 @@ const { t } = useI18n()
 // The RU hero title uses a non-breaking hyphen so «Веб‑разработчик» never splits at it;
 // the h1 sizes were measured on the longer «Инженер‑разработчик», so it fits with room.
 // What the hero's tag row shows: the front-end core first, then the backend and 3D.
-const HERO_STACK = ['Vue', 'Nuxt', 'Svelte', 'TypeScript', 'Node.js', 'Go', 'Three.js']
+const HERO_STACK = ['Vue', 'Svelte', 'Node.js', 'Go', 'Three.js']
 
 const featured = featuredProjects()
 const { getLessonById } = useLessons()
