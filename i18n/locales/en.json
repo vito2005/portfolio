@@ -64,5 +64,9 @@
     "select": "Choose an experiment",
     "experiment": "Experiment",
     "open": "Open"
+  },
+  "seo": {
+    "name": "Alex Buki",
+    "home_title": "Alex Buki — Software Engineer"
   }
 }

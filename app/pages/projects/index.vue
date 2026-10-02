@@ -23,7 +23,7 @@ const groups = computed(() => [
 ])
 
 usePageSeo({
-  title: `${t('projects.title')} | Alex Buki`,
+  title: `${t('projects.title')} | ${t('seo.name')}`,
   description: t('projects.intro'),
 })
 </script>

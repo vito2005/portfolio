@@ -24,7 +24,7 @@ const { getAllLessons } = useLessons()
 const lessons = [...getAllLessons()].sort((a, b) => b.order - a.order)
 
 usePageSeo({
-  title: `${t('lab.title')} | Alex Buki`,
+  title: `${t('lab.title')} | ${t('seo.name')}`,
   description: t('lab.subtitle'),
 })
 </script>

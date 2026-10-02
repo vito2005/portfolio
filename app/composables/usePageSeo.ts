@@ -14,7 +14,7 @@ export interface PageSeoOptions {
 export const usePageSeo = ({ title, description, type = 'website', image = '/og-image.png' }: PageSeoOptions) => {
   const route = useRoute()
   const url = useRequestURL()
-  const { locale, locales } = useI18n()
+  const { locale, locales, t } = useI18n()
   const switchLocalePath = useSwitchLocalePath()
 
   const canonicalUrl = url.origin + route.path
@@ -36,7 +36,7 @@ export const usePageSeo = ({ title, description, type = 'website', image = '/og-
       { property: 'og:description', content: description },
       { property: 'og:url', content: canonicalUrl },
       { property: 'og:image', content: imageUrl },
-      { property: 'og:site_name', content: 'Alex Buki' },
+      { property: 'og:site_name', content: t('seo.name') },
       { property: 'og:locale', content: locale.value === 'ru' ? 'ru_RU' : 'en_US' },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },

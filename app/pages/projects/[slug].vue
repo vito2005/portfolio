@@ -81,7 +81,7 @@ const blocks = computed(() => [
 ])
 
 usePageSeo({
-  title: `${project.title} | Alex Buki`,
+  title: `${project.title} | ${t('seo.name')}`,
   description: pick(project.tagline),
   type: 'article',
   image: pick(project.cover),

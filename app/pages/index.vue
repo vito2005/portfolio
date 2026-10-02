@@ -121,8 +121,8 @@ const localePath = useLocalePath()
 const { pick } = useLocalized()
 const { t } = useI18n()
 
-// The RU hero title uses a non-breaking hyphen and the h1 sizes above are measured so
-// «Инженер‑разработчик.» stays on one line from 360px phones up to wide desktops.
+// The RU hero title uses a non-breaking hyphen so «Веб‑разработчик» never splits at it;
+// the h1 sizes were measured on the longer «Инженер‑разработчик», so it fits with room.
 // What the hero's tag row shows: the front-end core first, then the backend and 3D.
 const HERO_STACK = ['Vue', 'Nuxt', 'Svelte', 'TypeScript', 'Node.js', 'Go', 'Three.js']
 
@@ -146,7 +146,7 @@ const lessons = HOME_LESSON_IDS
   .filter((lesson): lesson is Lesson => Boolean(lesson))
 
 usePageSeo({
-  title: 'Alex Buki - Software Engineer',
+  title: t('seo.home_title'),
   // The visible title has no full stop; the meta description needs one between sentences.
   description: [`${t('hero.title')}.`, t('hero.subtitle'), t('hero.now', { studio: 'Vide Infra' })].join(' '),
 })
