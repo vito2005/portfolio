@@ -12,7 +12,7 @@ export const contacts = {
 /** About section on the home page: one line on what I do, then three proof points. */
 export const aboutIntro: Localized = {
   en: 'Full-stack with a front-end lean. I build design-led interfaces and take them all the way to production: SSR, tests, CI, monitoring.',
-  ru: 'Фулстек с уклоном во фронтенд. Делаю интерфейсы, где важен дизайн, и довожу их до продакшена: SSR, тесты, CI, мониторинг.',
+  ru: 'Фулстек с уклоном во фронтенд. Делаю интерфейсы, где важен дизайн, и довожу их до релиза: SSR, тесты, CI, мониторинг.',
 }
 
 export const aboutFacts: Localized[] = [

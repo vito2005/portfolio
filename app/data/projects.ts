@@ -193,7 +193,7 @@ export const projects: Project[] = [
     kind: 'side',
     featured: false,
     period: { en: '2026', ru: '2026' },
-    role: { en: 'Everything, from idea to production', ru: 'Всё, от идеи до продакшена' },
+    role: { en: 'Everything, from idea to production', ru: 'Всё: от идеи до запуска' },
     tagline: {
       en: 'Voice-first life inbox: a Telegram bot that turns voice notes into a categorized dashboard.',
       ru: 'Голосовой инбокс: Telegram-бот превращает голосовые заметки в структурированный дашборд.',
