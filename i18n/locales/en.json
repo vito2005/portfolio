@@ -63,7 +63,10 @@
     "subtitle": "Three.js experiments. Some follow the Bruno Simon course, the later ones are my own.",
     "select": "Choose an experiment",
     "experiment": "Experiment",
-    "open": "Open"
+    "open": "Open",
+    "other": "Other experiments",
+    "other_short": "More",
+    "loading_font": "Loading font…"
   },
   "seo": {
     "name": "Alex Buki",

@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page py-12 sm:py-16">
     <div class="mb-10">
       <h1 class="font-serif text-4xl tracking-tight text-ink sm:text-5xl">{{ $t('lab.title') }}</h1>
       <p class="mt-4 max-w-[60ch] leading-relaxed text-ink-soft">{{ $t('lab.subtitle') }}</p>
@@ -13,10 +13,6 @@
 <script setup lang="ts">
 import { useLessons } from '@/composables/three-js-lessons/useLessons'
 
-definePageMeta({
-  layout: 'lessons',
-  scrollsWithDocument: true,
-})
 
 const { t } = useI18n()
 const { getAllLessons } = useLessons()

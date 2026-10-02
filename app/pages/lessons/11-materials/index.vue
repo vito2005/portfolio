@@ -13,29 +13,7 @@ definePageMeta({
   layout: "lessons",
 });
 
-const route = useRoute()
-const url = useRequestURL()
-const canonicalUrl = url.origin + route.path
-
-const seoTitle = 'Materials — Three.js Lesson | Alex Buki Developer'
-const seoDescription =
-  'Learn to create and use materials in Three.js: MeshStandardMaterial, MeshPhysicalMaterial, and more. Interactive lesson with live controls.'
-
-useHead({
-  title: seoTitle,
-  meta: [
-    { name: 'description', content: seoDescription },
-    { property: 'og:type', content: 'article' },
-    { property: 'og:title', content: seoTitle },
-    { property: 'og:description', content: seoDescription },
-    { property: 'og:url', content: canonicalUrl },
-    { property: 'og:site_name', content: 'Alex Buki Developer' },
-    { name: 'twitter:card', content: 'summary' },
-    { name: 'twitter:title', content: seoTitle },
-    { name: 'twitter:description', content: seoDescription },
-  ],
-  link: [{ rel: 'canonical', href: canonicalUrl }],
-})
+useLessonSeo('11')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)

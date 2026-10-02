@@ -1,69 +1,67 @@
 <template>
-  <div
-    class="flex flex-col bg-[#F9F8F6]"
-    :class="scrollsWithDocument ? 'min-h-screen' : 'h-screen min-h-0 overflow-hidden'"
-  >
-    <header class="border-b border-gray-200 sticky top-0 z-50 bg-[#F9F8F6]">
-      <nav class="container mx-auto px-6 py-5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-5">
-            <NuxtLink to="/" class="font-serif italic text-xl text-gray-900 tracking-tight">A.B.</NuxtLink>
-            <span class="text-gray-300" aria-hidden="true">|</span>
-            <NuxtLink to="/lessons" class="text-sm text-gray-500 hover:text-gray-900 transition-colors">Examples</NuxtLink>
+  <div class="flex h-dvh min-h-0 flex-col overflow-hidden bg-paper">
+    <SiteHeader />
+    <div class="page flex items-center justify-between gap-4 py-3">
+      <h1 class="min-w-0 truncate font-serif text-xl tracking-tight text-ink sm:text-2xl">
+        {{ currentLesson ? pick(currentLesson.title) : $t('lab.title') }}
+      </h1>
+      <Dropdown
+        :options="lessonOptions"
+        :selected-value="currentLesson?.id ?? null"
+        :placeholder="$t('lab.select')"
+        label-key="title"
+        value-key="id"
+        @select="handleLessonSelect"
+      >
+        <template #button>
+          <span class="sm:hidden">{{ $t('lab.other_short') }}</span>
+          <span class="hidden sm:inline">{{ $t('lab.other') }}</span>
+        </template>
+        <template #option="{ option }">
+          <div class="flex flex-col">
+            <span class="font-medium">{{ option.title }}</span>
+            <span class="text-xs text-ink-mute">{{ $t('lab.experiment') }} {{ option.order }}</span>
           </div>
-          <Dropdown
-            :options="allLessons"
-            :selected-value="selectedLessonId"
-            placeholder="Select example"
-            label-key="title"
-            value-key="id"
-            subtitle-key="order"
-            @select="handleLessonSelect"
-          >
-            <template #option="{ option }">
-              <div class="flex flex-col">
-                <span class="font-medium">{{ option.title }}</span>
-                <span class="text-xs text-gray-500">Example {{ option.order }}</span>
-              </div>
-            </template>
-          </Dropdown>
-        </div>
-      </nav>
-    </header>
-    <main class="flex-1 flex flex-col min-h-0 p-4">
+        </template>
+      </Dropdown>
+    </div>
+    <main class="page flex min-h-0 flex-1 flex-col pb-4">
       <slot />
     </main>
-    <footer class="border-t border-gray-200">
-      <div class="container mx-auto px-6 py-4 flex gap-6 text-xs text-ink-mute">
-        <NuxtLink to="/" class="hover:text-gray-700 transition-colors">Home</NuxtLink>
-        <NuxtLink to="/lessons" class="hover:text-gray-700 transition-colors">Examples</NuxtLink>
-      </div>
-    </footer>
+    <SiteFooter compact />
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script setup lang="ts">
 import { useLessons } from '@/composables/three-js-lessons/useLessons'
 
 const route = useRoute()
 const router = useRouter()
+const localePath = useLocalePath()
+const { pick } = useLocalized()
 const { getAllLessons } = useLessons()
 
-const { pick } = useLocalized()
-// The dropdown reads plain strings, so titles are picked for the current locale here.
-const allLessons = computed(() => getAllLessons().map(lesson => ({ ...lesson, title: pick(lesson.title) })))
-const selectedLessonId = computed(() => route.params.id || null)
+// The shell is exactly one screen tall (dvh, so the iOS toolbar doesn't hide the
+// bottom): header, the lesson bar, the canvas taking whatever is left (the
+// flex-1 + min-h-0 chain is what sizes it), then a one-line footer.
+// The switcher button says "Other experiments" (just "More" on phones, where the
+// lesson title needs the room); the current lesson is highlighted in the list.
 
-// Canvas lessons need the fixed h-screen box (that chain is what sizes the canvas).
-// Document-like pages opt in to normal page scroll, so the footer sits after the
-// content instead of being pinned to the bottom of the viewport.
-const scrollsWithDocument = computed(() => route.meta.scrollsWithDocument === true)
+// Lesson routes are plain folders, not a dynamic param, so the current lesson is
+// found by matching the localized path (/lessons/… or /ru/lessons/…).
+const currentLesson = computed(() =>
+  getAllLessons().find(lesson => localePath(lesson.path) === route.path) ?? null,
+)
 
-const handleLessonSelect = (lesson) => {
-  router.push(lesson.path)
+// Newest first, as on the Lab page. The dropdown reads plain strings, so titles
+// are picked for the current locale here.
+const lessonOptions = computed(() =>
+  [...getAllLessons()]
+    .sort((a, b) => b.order - a.order)
+    .map(lesson => ({ ...lesson, title: pick(lesson.title) })),
+)
+
+function handleLessonSelect(lesson: { path: string }) {
+  router.push(localePath(lesson.path))
 }
 </script>
-
-<style scoped></style>

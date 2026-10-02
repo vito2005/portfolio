@@ -3,9 +3,9 @@
     <canvas ref="canvasRef" class="w-full h-full outline-none touch-none" />
     <div
       v-if="isLoading"
-      class="absolute inset-0 flex items-center justify-center bg-[#F9F8F6] text-sm text-gray-400"
+      class="absolute inset-0 flex items-center justify-center bg-paper text-sm text-ink-mute"
     >
-      Loading font…
+      {{ $t('lab.loading_font') }}
     </div>
   </div>
 </template>
@@ -28,29 +28,7 @@ definePageMeta({
   layout: 'lessons',
 })
 
-const route = useRoute()
-const url = useRequestURL()
-const canonicalUrl = url.origin + route.path
-
-const seoTitle = 'Kinetic Text — Three.js Lesson | Alex Buki Developer'
-const seoDescription
-  = 'Interactive kinetic typography with Three.js: extruded per-letter geometry, pointer raycasting and spring physics that knock letters out of the headline and settle them back.'
-
-useHead({
-  title: seoTitle,
-  meta: [
-    { name: 'description', content: seoDescription },
-    { property: 'og:type', content: 'article' },
-    { property: 'og:title', content: seoTitle },
-    { property: 'og:description', content: seoDescription },
-    { property: 'og:url', content: canonicalUrl },
-    { property: 'og:site_name', content: 'Alex Buki Developer' },
-    { name: 'twitter:card', content: 'summary' },
-    { name: 'twitter:title', content: seoTitle },
-    { name: 'twitter:description', content: seoDescription },
-  ],
-  link: [{ rel: 'canonical', href: canonicalUrl }],
-})
+useLessonSeo('50')
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)

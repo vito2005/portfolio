@@ -9,8 +9,8 @@
           <li v-for="item in links" :key="item.label">
             <NuxtLink
               :to="item.to"
-              class="text-ink-soft transition-colors hover:text-ink"
-              :active-class="item.isSection ? '' : 'text-ink'"
+              class="transition-colors hover:text-ink"
+              :class="isCurrent(item) ? 'text-ink' : 'text-ink-soft'"
             >
               {{ $t(item.label) }}
             </NuxtLink>
@@ -84,6 +84,12 @@ const links = computed(() => [
   { label: 'nav.about', to: `${localePath('/')}#about`, isSection: true },
   { label: 'nav.contact', to: `${localePath('/')}#contact`, isSection: true },
 ])
+
+// A section lights up on its own pages too: Lab on every lesson, Projects on every
+// case study. Those are sibling routes, so the router's active class misses them.
+function isCurrent(item: { to: string, isSection: boolean }) {
+  return !item.isSection && route.path.startsWith(item.to)
+}
 
 // Two locales only, so the switch is a single toggle rather than a menu.
 const otherLocale = computed(() => (locale.value === 'en' ? 'ru' : 'en'))

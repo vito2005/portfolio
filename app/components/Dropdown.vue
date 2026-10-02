@@ -2,9 +2,13 @@
 <template>
   <div ref="dropdownRef" class="relative">
     <button
-      class="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
+      type="button"
+      class="flex items-center gap-2 whitespace-nowrap rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:border-ink-mute"
+      :aria-expanded="isDropdownOpen"
       @click="toggleDropdown">
-      <span>{{ displayText }}</span>
+      <slot name="button" :text="displayText">
+        <span>{{ displayText }}</span>
+      </slot>
       <svg
         class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpen }" fill="none"
         stroke="currentColor" viewBox="0 0 24 24">
@@ -17,16 +21,16 @@
       leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
       <ul
 v-if="isDropdownOpen"
-        class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white border border-gray-200 py-1 z-50 max-h-96 overflow-y-auto">
+        class="absolute right-0 z-50 mt-2 max-h-96 w-60 overflow-y-auto rounded-md border border-line bg-surface py-1 text-sm text-ink shadow-lg">
         <li
 v-for="option in options" :key="getOptionId(option)"
-          class="px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors" :class="{
-            'bg-blue-50 text-blue-600': isSelected(option),
+          class="cursor-pointer px-4 py-2 transition-colors hover:bg-paper-deep" :class="{
+            'bg-paper-deep': isSelected(option),
           }" @click="selectOption(option)">
           <slot name="option" :option="option">
             <div class="flex flex-col">
               <span class="font-medium">{{ getOptionLabel(option) }}</span>
-              <span v-if="getOptionSubtitle(option)" class="text-xs text-gray-500">
+              <span v-if="getOptionSubtitle(option)" class="text-xs text-ink-mute">
                 {{ getOptionSubtitle(option) }}
               </span>
             </div>

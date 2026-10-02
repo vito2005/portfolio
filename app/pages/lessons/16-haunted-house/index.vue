@@ -20,29 +20,7 @@ definePageMeta({
   layout: "lessons",
 });
 
-const route = useRoute()
-const url = useRequestURL()
-const canonicalUrl = url.origin + route.path
-
-const seoTitle = 'Haunted House — Three.js Lesson | Alex Buki Developer'
-const seoDescription =
-  'Build a haunted house scene with Three.js: textured walls, roof, door, graves, ghosts, shadows, sky and fog.'
-
-useHead({
-  title: seoTitle,
-  meta: [
-    { name: 'description', content: seoDescription },
-    { property: 'og:type', content: 'article' },
-    { property: 'og:title', content: seoTitle },
-    { property: 'og:description', content: seoDescription },
-    { property: 'og:url', content: canonicalUrl },
-    { property: 'og:site_name', content: 'Alex Buki Developer' },
-    { name: 'twitter:card', content: 'summary' },
-    { name: 'twitter:title', content: seoTitle },
-    { name: 'twitter:description', content: seoDescription },
-  ],
-  link: [{ rel: 'canonical', href: canonicalUrl }],
-})
+useLessonSeo('16')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
