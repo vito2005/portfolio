@@ -17,6 +17,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { useLabScene } from '@/composables/lab/useLabScene'
+import { type CodeScreen, createBarTable, createCodeScreen, fitScreenUvs, TABLE_TOP_Y } from '@/composables/hero/heroDesk'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -31,6 +32,20 @@ let disposeScene: (() => void) | null = null
 let mixer: THREE.AnimationMixer | null = null
 let model: THREE.Group | null = null
 const CROSSFADE_S = 0.4
+let desk: THREE.Group | null = null
+let codeScreen: CodeScreen | null = null
+
+/**
+ * Where the desk stands next to the avatar (on its left, screen right, away from
+ * the waving hand) and how the laptop on it is turned: three-quarters to the
+ * viewer, so the screen with the code reads from the front.
+ */
+const DESK_LAYOUT = {
+  position: new THREE.Vector3(0.72, 0, -0.02),
+  laptopYaw: -0.6,
+  /** Laptop width in avatar units: oversized for a 30 cm laptop on purpose, so the screen reads at hero size. */
+  laptopWidth: 0.48,
+}
 let detachTouch: (() => void) | null = null
 
 // iOS Safari can still turn a long horizontal swipe that drifts up or down into a page
@@ -140,8 +155,45 @@ onMounted(() => {
       })
       scene.add(model)
 
+      const table = createBarTable()
+      table.position.copy(DESK_LAYOUT.position)
+      scene.add(table)
+      desk = table
+      try {
+        // "MacBook Laptop" by Issac Ghazanfar, CC BY 4.0 (credited in the footer).
+        const laptop = (await loader.loadAsync('/models/laptop.glb')).scene
+        // The model sits far from its origin and in odd units: centre it, stand it on
+        // its base and scale it by width.
+        const laptopBounds = new THREE.Box3().setFromObject(laptop)
+        const laptopSize = laptopBounds.getSize(new THREE.Vector3())
+        const laptopCenter = laptopBounds.getCenter(new THREE.Vector3())
+        laptop.position.set(-laptopCenter.x, -laptopBounds.min.y, -laptopCenter.z)
+        const laptopHolder = new THREE.Group()
+        laptopHolder.add(laptop)
+        laptopHolder.scale.setScalar(DESK_LAYOUT.laptopWidth / laptopSize.x)
+        laptopHolder.position.y = TABLE_TOP_Y
+        laptopHolder.rotation.y = DESK_LAYOUT.laptopYaw
+        table.add(laptopHolder)
+
+        // The screen is its own quad: swap its picture for the typing editor, unlit so it glows.
+        codeScreen = createCodeScreen()
+        laptop.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial && child.material.name === 'Material.003') {
+            fitScreenUvs(child.geometry)
+            child.material.map?.dispose()
+            child.material.dispose()
+            child.material = new THREE.MeshBasicMaterial({ map: codeScreen!.texture, toneMapped: false })
+          }
+        })
+      }
+      catch (error) {
+        // The avatar still works without its desk props.
+        console.error('Laptop model failed to load:', error)
+      }
+
       // Frame the whole character: distance from its height and the lens.
-      const bounds = new THREE.Box3().setFromObject(model)
+      // The desk is part of the shot, so the frame covers both.
+      const bounds = new THREE.Box3().setFromObject(model).union(new THREE.Box3().setFromObject(table))
       const size = bounds.getSize(new THREE.Vector3())
       const center = bounds.getCenter(new THREE.Vector3())
       const distance = (size.y / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.15
@@ -193,6 +245,7 @@ onMounted(() => {
 
   const tick = () => {
     mixer?.update(clock.getDelta())
+    codeScreen?.update(clock.elapsedTime)
     controls!.update()
     renderer!.render(scene, camera)
     animationId = requestAnimationFrame(tick)
@@ -206,22 +259,25 @@ onUnmounted(() => {
   disposeScene?.()
   controls?.dispose()
   mixer?.stopAllAction()
-  model?.traverse((child) => {
-    if (!(child instanceof THREE.Mesh)) {
-      return
-    }
-    child.geometry.dispose()
-    const materials = Array.isArray(child.material) ? child.material : [child.material]
-    for (const material of materials) {
-      // The PBR model carries colour, normal and ORM maps; free every one of them.
-      for (const value of Object.values(material)) {
-        if (value instanceof THREE.Texture) {
-          value.dispose()
-        }
+  codeScreen?.dispose()
+  for (const root of [model, desk]) {
+    root?.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) {
+        return
       }
-      material.dispose()
-    }
-  })
+      child.geometry.dispose()
+      const materials = Array.isArray(child.material) ? child.material : [child.material]
+      for (const material of materials) {
+        // Free every map a material carries (the avatar's PBR set, the code canvas).
+        for (const value of Object.values(material)) {
+          if (value instanceof THREE.Texture) {
+            value.dispose()
+          }
+        }
+        material.dispose()
+      }
+    })
+  }
   renderer?.dispose()
 })
 </script>
