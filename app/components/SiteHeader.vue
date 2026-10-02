@@ -80,12 +80,12 @@ const route = useRoute()
 // so they never get the "active" colour (it would light up on the whole home page).
 const links = computed(() => [
   { label: 'nav.projects', to: localePath('/projects'), isSection: false },
-  { label: 'nav.lab', to: localePath('/lessons'), isSection: false },
+  { label: 'nav.lab', to: localePath('/lab'), isSection: false },
   { label: 'nav.about', to: `${localePath('/')}#about`, isSection: true },
   { label: 'nav.contact', to: `${localePath('/')}#contact`, isSection: true },
 ])
 
-// A section lights up on its own pages too: Lab on every lesson, Projects on every
+// A section lights up on its own pages too: Lab on every experiment, Projects on every
 // case study. Those are sibling routes, so the router's active class misses them.
 function isCurrent(item: { to: string, isSection: boolean }) {
   return !item.isSection && route.path.startsWith(item.to)

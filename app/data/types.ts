@@ -57,3 +57,13 @@ export interface ExperienceEntry {
   /** Before 2020: folded into one summary line instead of a full entry. */
   early?: boolean
 }
+
+export interface LabExperiment {
+  /**
+   * Route segment `/lab/<slug>`, and the name of its tile assets:
+   * `/images/lab/<slug>.webp` and the clip `/videos/lab/<slug>.{webm,mp4}`.
+   */
+  slug: string
+  title: Localized
+  description: Localized
+}

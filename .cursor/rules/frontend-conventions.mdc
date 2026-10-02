@@ -6,12 +6,12 @@ alwaysApply: false
 
 Code conventions for this project are defined in @AGENTS.md.
 
-Follow them for every `.vue`, `.ts` and `.css` file under `app/`: build scenes
-through `useLesson`, always tear a scene down in `onUnmounted` (cancel the tick,
+Follow them for every `.vue`, `.ts` and `.css` file under `app/`: build Lab scenes
+through `useLabScene`, always tear a scene down in `onUnmounted` (cancel the tick,
 dispose geometries/materials/textures/renderer, clear timers and listeners), size
-the canvas from its container rather than the window, keep lesson pages thin by
-moving heavy logic into `composables/three-js-lessons/`, register every new
-lesson in `useLessons.ts`, give each page its SEO `useHead` block, use
-`<script setup lang="ts">` and avoid `any`, reuse the `.btn` / `.card` Tailwind
-component classes instead of new raw hex values, reserve `handle*` names for
-event handlers, and delete dead or commented-out code.
+the canvas from its container rather than the window, keep experiment pages thin by
+moving heavy logic into `composables/lab/`, register every new experiment in
+`app/data/lab.ts`, give each page its head via `usePageSeo` (`useLabSeo` for Lab
+experiments), use `<script setup lang="ts">` and avoid `any`, reuse the `.btn` /
+`.card` Tailwind component classes instead of new raw hex values, reserve
+`handle*` names for event handlers, and delete dead or commented-out code.

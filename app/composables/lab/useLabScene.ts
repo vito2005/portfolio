@@ -4,30 +4,30 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import GUI from 'lil-gui'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 
-export interface LessonOptions {
+export interface LabSceneOptions {
     /**
-     * MSAA is off by default because most lessons lean on textures and don't
+     * MSAA is off by default because most experiments lean on textures and don't
      * need it. Scenes built from hard vector-like edges (extruded text, flat
      * colours) do — jaggies are the whole difference there.
      */
     antialias?: boolean
     /**
      * Transparent canvas, so the page background shows through. Off for
-     * lessons (they paint their own backdrop), on for the home-page avatar.
+     * experiments (they paint their own backdrop), on for the home-page avatar.
      */
     alpha?: boolean
 }
 
-export const useLesson = (
+export const useLabScene = (
     canvasRef: Ref<HTMLCanvasElement | null>,
     containerRef: Ref<HTMLDivElement | null>,
-    options: LessonOptions = {},
+    options: LabSceneOptions = {},
 ) => {
     const canvas = canvasRef.value
     const container = containerRef.value
 
     if (!canvas || !container) {
-        throw new Error('useLesson must be called from onMounted, once the canvas and container refs are bound')
+        throw new Error('useLabScene must be called from onMounted, once the canvas and container refs are bound')
     }
 
     const sizes = {
@@ -94,7 +94,7 @@ export const useLesson = (
     /**
      * Handle resize
      *
-     * The canvas is a box inside the lessons layout, not the viewport — reading
+     * The canvas is a box inside the lab layout, not the viewport — reading
      * `window.innerWidth` here over-renders and drifts the aspect ratio as soon
      * as there is header/footer chrome.
      */
@@ -112,7 +112,7 @@ export const useLesson = (
     window.addEventListener('resize', handleResize)
 
     /** Call from `onUnmounted` — the resize listener outlives the route otherwise. */
-    const disposeLesson = () => {
+    const disposeScene = () => {
         window.removeEventListener('resize', handleResize)
     }
 
@@ -125,6 +125,6 @@ export const useLesson = (
         renderer,
         gui,
         hdrLoader,
-        disposeLesson
+        disposeScene
     }
 }

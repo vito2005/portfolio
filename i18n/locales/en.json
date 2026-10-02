@@ -46,7 +46,6 @@
     "period": "Period",
     "side_project": "Side project",
     "back": "All projects",
-    "open": "Open project",
     "not_found": "There is no project at this address.",
     "freelance": "Freelance"
   },
@@ -62,8 +61,6 @@
     "title": "Lab",
     "subtitle": "WebGL experiments in Three.js: materials, light, environment maps, kinetic type. Every scene can be orbited and tweaked.",
     "select": "Choose an experiment",
-    "experiment": "Experiment",
-    "open": "Open",
     "other": "Other experiments",
     "other_short": "More",
     "loading_font": "Loading font…"

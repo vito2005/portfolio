@@ -18,17 +18,18 @@ npm start          # what Railway runs: node .output/server/index.mjs
 
 Because nothing else verifies behaviour: **a Three.js change is not "done" until
 the scene has actually been rendered in a browser.** Run `npm run dev`, open the
-lesson, check the console for WebGL/Three warnings, and screenshot it (Playwright
+experiment, check the console for WebGL/Three warnings, and screenshot it (Playwright
 MCP is available). "It compiles" says nothing about a scene.
 
 ## Project layout
 
 | Path | What lives there |
 |------|------------------|
-| `app/pages/lessons/<order>-<slug>/index.vue` | One Three.js lesson = one route |
-| `app/composables/three-js-lessons/` | Shared scene setup + heavy per-lesson logic |
+| `app/pages/lab/<slug>/index.vue` | One Lab experiment (Three.js scene) = one route |
+| `app/data/lab.ts` | The list of Lab experiments (titles, descriptions, order) |
+| `app/composables/lab/` | Shared scene setup (`useLabScene`) + heavy per-experiment logic |
 | `app/components/` | Auto-imported UI components (flat, no subfolders yet) |
-| `app/layouts/` | `default` (site chrome) and `lessons` (full-height canvas shell) |
+| `app/layouts/` | `default` (site chrome) and `lab` (one-screen canvas shell with the site header/footer) |
 | `app/assets/css/tailwind.css` | Tailwind entry + `@layer` base/components |
 | `public/textures`, `public/models`, `public/environmentMaps`, `public/fonts` | Scene assets, loaded by absolute URL |
 
@@ -36,34 +37,34 @@ Imports use the `@/` alias (`@/composables/...` → `app/`), configured in
 `tsconfig.json`. Nuxt's `~/` resolves to the same place — keep using `@/` for
 consistency with the existing files. Composables, components and Nuxt utilities
 (`useHead`, `useRoute`, `useRequestURL`) are auto-imported; explicit `vue`
-imports (`ref`, `onMounted`) are still written out in lesson pages — match the
+imports (`ref`, `onMounted`) are still written out in experiment pages — match the
 file you're editing.
 
-## Three.js: build the scene through `useLesson`
+## Three.js: build the scene through `useLabScene`
 
-`composables/three-js-lessons/useLesson.ts` owns scene, camera, renderer,
-`OrbitControls`, `lil-gui` and the loaders. A lesson page asks it for what it
+`composables/lab/useLabScene.ts` owns scene, camera, renderer,
+`OrbitControls`, `lil-gui` and the loaders. An experiment page asks it for what it
 needs — it does not hand-roll a `WebGLRenderer`.
 
 ```js
 // ✗ a second renderer/camera/controls stack inside the page
 const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.value })
 
-// ✓ one shared setup, destructure what the lesson uses
-const { camera, scene, renderer, controls, gui, textureLoader } = useLesson(canvasRef, containerRef)
+// ✓ one shared setup, destructure what the experiment uses
+const { camera, scene, renderer, controls, gui, textureLoader } = useLabScene(canvasRef, containerRef)
 ```
 
 Need a loader or capability that isn't there yet (that's how `HDRLoader` and
-`FontLoader` arrived)? Add it to `useLesson` and return it, rather than
-instantiating it in the page — unless it is genuinely used by one lesson only
-(`GLTFLoader` in `24-environment-map` is a fair exception).
+`FontLoader` arrived)? Add it to `useLabScene` and return it, rather than
+instantiating it in the page — unless it is genuinely used by one experiment only
+(`GLTFLoader` in `environment-map` is a fair exception).
 
-`useLesson` reads `containerRef.value.clientWidth/Height`, so it **must** be
+`useLabScene` reads `containerRef.value.clientWidth/Height`, so it **must** be
 called from `onMounted` after a `canvasRef.value && containerRef.value` guard.
 
 ## Three.js: every scene must tear itself down
 
-Lesson routes are SPA-navigable — leaving a page without cleanup leaks a live
+Lab routes are SPA-navigable — leaving a page without cleanup leaks a live
 render loop and GPU memory, and a few visits are enough to make the tab crawl.
 Every page that starts a scene needs a matching `onUnmounted`:
 
@@ -78,7 +79,8 @@ onUnmounted(() => {
     material.normalMap?.dispose()
     material.dispose()
   }
-  renderer?.dispose()                 // 5. last: drop the GL context
+  disposeScene?.()                    // 5. useLabScene's own listeners
+  renderer?.dispose()                 // 6. last: drop the GL context
 })
 ```
 
@@ -87,22 +89,18 @@ Rules of thumb:
 - Anything you `new`'d that has a `.dispose()` — `BufferGeometry`, `Material`,
   `Texture`, `WebGLRenderTarget` — is yours to dispose. Keep a reference at
   module scope (like `inscriptionMaterials`) if it's created inside a loop.
-- Clear every timer you set (`initialLoadTimeoutId` in `16-haunted-house`).
+- Clear every timer you set (`initialLoadTimeoutId` in `haunted-house`).
 - Remove every `addEventListener` you add.
 - Store `animationId`, `renderer`, `controls`, `gui` in plain `let` outside
   `onMounted` — not in `ref()`; they are not reactive state and wrapping a
   Three.js object in a proxy is a real footgun.
 
-Known debt: `11-materials/index.vue` has no `onUnmounted` at all, and
-`useLesson`'s internal `resize` listener is never removed. Fix these when you
-touch those files — don't copy the pattern into a new lesson.
-
 ## Three.js: sizing comes from the container, not the window
 
-The canvas lives inside a flex container in the `lessons` layout, not fullscreen.
-`useLesson`'s `handleResize` currently reads `window.innerWidth/innerHeight`,
-which is wrong the moment header/footer chrome exists — the canvas over-renders
-and the aspect ratio drifts. New or edited resize code reads the container:
+The canvas lives inside a flex container in the `lab` layout, between the site
+header and footer, not fullscreen. Reading `window.innerWidth/innerHeight` makes
+the canvas over-render and the aspect ratio drift; `useLabScene`'s resize
+handler reads the container, and so must any resize code of your own:
 
 ```js
 // ✗ assumes the canvas fills the viewport
@@ -118,11 +116,10 @@ Cap the pixel ratio — `renderer.setPixelRatio(Math.min(window.devicePixelRatio
 
 ## Three.js: keep the page thin
 
-A lesson page is scene *composition*: geometry, materials, lights, GUI bindings,
+An experiment page is scene *composition*: geometry, materials, lights, GUI bindings,
 tick. When it grows past ~300 lines, or when a chunk of it is really an
-algorithm, move that chunk into `composables/three-js-lessons/` as a plain
-module — `graveInscriptions.ts` (procedural canvas epitaphs → alpha/normal maps)
-is the model: typed exports, a doc comment explaining *why*, no Vue reactivity.
+algorithm, move that chunk into `composables/lab/` as a plain
+module — `kineticText.ts` (per-letter geometry and spring physics) is the model: typed exports, a doc comment explaining *why*, no Vue reactivity.
 
 Use the existing `/** Section */` block comments (`Textures`, `House`, `Lights`,
 `Animate`) to keep long scene files navigable.
@@ -133,57 +130,48 @@ Use the existing `/** Section */` block comments (`Textures`, `House`, `Lights`,
   HDRIs in `public/environmentMaps/`. Load them by absolute URL (`/textures/…`) —
   they are static files, not bundler imports.
 - Prefer **`.webp`** for texture maps (the `door/` folder still has `.jpg`
-  duplicates from an earlier lesson — new work shouldn't add more). Keep to 1k
+  duplicates from an earlier experiment — new work shouldn't add more). Keep to 1k
   maps; this is a portfolio, not a game.
 - **Colour maps need `texture.colorSpace = THREE.SRGBColorSpace`.** ARM, normal
   and displacement maps must stay linear — setting sRGB on them is a silent
   rendering bug.
 - Long loads get the spinner overlay: `isLoading` ref + a `pendingAssets`
   counter decremented from both the success **and** error callbacks, so a 404
-  can't leave the overlay stuck forever. `16-haunted-house` also arms an 8s
+  can't leave the overlay stuck forever. `haunted-house` also arms an 8s
   timeout as a backstop — copy that when a scene loads many textures.
 
-## Adding a lesson
+## Adding a Lab experiment
 
-1. Create `app/pages/lessons/<order>-<slug>/index.vue` (folder name = the
-   ExerciseNN-slug used by the source course).
-2. `definePageMeta({ layout: 'lessons' })` + the container/canvas template from
-   an existing lesson.
-3. Add the SEO `useHead` block (below).
-4. Register it in `composables/three-js-lessons/useLessons.ts` — `id`, `order`
-   and `path` must agree with the folder name, or the layout's dropdown and the
-   `/lessons` index will disagree with the router.
+1. Create `app/pages/lab/<slug>/index.vue`. The slug is a plain name
+   (`kinetic-text`), no course numbers.
+2. `definePageMeta({ layout: 'lab' })` + the container/canvas template from an
+   existing experiment, and `useLabSeo('<slug>')` for the head.
+3. Add it to `labExperiments` in `app/data/lab.ts` (newest first) with the same
+   `slug` and RU/EN title and description.
+4. Tile assets named by the slug: `public/images/lab/<slug>.webp` (800×450) and
+   the clip `public/videos/lab/<slug>.webm` + `.mp4`.
 5. `onMounted` init + `onUnmounted` teardown.
 
-`useLessons` is the single source of truth for the lesson list; there is no
-filesystem scan. A lesson that isn't registered is unreachable from the UI.
+`app/data/lab.ts` is the single source of truth for the Lab; there is no
+filesystem scan. An experiment that isn't listed is unreachable from the UI.
 
 ## SEO: every page carries its own head
 
-Every route sets title, description, OG/Twitter tags and a canonical link built
-from `useRequestURL()`. Copy the block from an existing page and change the two
-`seoTitle` / `seoDescription` constants:
-
-```js
-const route = useRoute()
-const url = useRequestURL()
-const canonicalUrl = url.origin + route.path
-
-useHead({ title: seoTitle, meta: [...], link: [{ rel: 'canonical', href: canonicalUrl }] })
-```
-
-Don't hard-code the origin — the site runs on Railway behind a real domain and
-locally on `:3000`.
+Every route sets title, description, OG/Twitter tags, canonical and hreflang
+links through `usePageSeo({ title, description })`; Lab experiments call
+`useLabSeo('<slug>')`, which builds them from `app/data/lab.ts` in the current
+locale. The origin comes from `useRequestURL()` — don't hard-code it: the site
+runs on abuki.dev and locally on the dev port.
 
 ## TypeScript
 
 New `.vue` files use `<script setup lang="ts">` and new logic goes in `.ts`.
-Several lesson pages are still plain JS — that's legacy, not a pattern to copy.
+Several experiment pages are still plain JS — that's legacy, not a pattern to copy.
 
 `any` switches off type-checking and hides real bugs. Type props, emits and
 composable returns explicitly; for a genuinely unknown value use `unknown` and
-narrow it. Shared shapes (like `Lesson`) are exported `interface`s from the
-composable that owns them.
+narrow it. Shared shapes (like `Project`, `LabExperiment`) are exported `interface`s,
+content types in `app/data/types.ts`.
 
 Note there is **no** typecheck script — TS errors will not fail anything
 automatically, which is exactly why the types have to be right by hand.
@@ -198,7 +186,7 @@ automatically, which is exactly why the types have to be right by hand.
   the fonts are already defined there. Don't invent a *new* raw hex.
 - Fonts: `font-serif` = DM Serif Display (headings), `font-sans` = DM Sans (body);
   both are loaded from Google Fonts in `nuxt.config.ts`.
-- Mobile-first: base classes for small screens, `sm:` / `md:` on top. The lesson
+- Mobile-first: base classes for small screens, `sm:` / `md:` on top. The lab
   shell relies on `h-screen` + `min-h-0` + `flex-1` to give the canvas its box —
   don't break that chain when restyling layouts.
 
@@ -207,12 +195,12 @@ automatically, which is exactly why the types have to be right by hand.
 A name should make clear what the thing is on its own.
 
 - `handleXYZ` is reserved for **event handlers** — functions bound to a DOM or
-  component event (`handleClick`, `handleLessonSelect`). Don't give a plain
+  component event (`handleClick`, `handleExperimentSelect`). Don't give a plain
   callable a `handle*` name.
 - Plain functions get verb names: `createGraveInscription()`, `typeText()`,
   `markTextureLoaded()`.
 - Composables are `useXxx` and live in `app/composables/`; a module that just
-  exports helpers (`graveInscriptions.ts`) is *not* a composable — don't prefix
+  exports helpers (`kineticText.ts`) is *not* a composable — don't prefix
   it with `use`.
 - Avoid single-letter names outside tiny local scopes.
 

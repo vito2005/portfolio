@@ -5,19 +5,15 @@
       <p class="mt-4 max-w-[60ch] leading-relaxed text-ink-soft">{{ $t('lab.subtitle') }}</p>
     </div>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <LessonCard v-for="lesson in lessons" :key="lesson.id" :lesson="lesson" />
+      <LabCard v-for="experiment in labExperiments" :key="experiment.slug" :experiment="experiment" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useLessons } from '@/composables/three-js-lessons/useLessons'
-
+import { labExperiments } from '@/data/lab'
 
 const { t } = useI18n()
-const { getAllLessons } = useLessons()
-// Newest first, as on the home page: the latest experiment (kinetic type) leads.
-const lessons = [...getAllLessons()].sort((a, b) => b.order - a.order)
 
 usePageSeo({
   title: `${t('lab.title')} | ${t('seo.name')}`,

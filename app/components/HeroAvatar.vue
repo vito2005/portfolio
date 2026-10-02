@@ -16,7 +16,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -27,7 +27,7 @@ const isLoading = ref(true)
 let animationId = 0
 let renderer: THREE.WebGLRenderer | null = null
 let controls: OrbitControls | null = null
-let disposeLesson: (() => void) | null = null
+let disposeScene: (() => void) | null = null
 let mixer: THREE.AnimationMixer | null = null
 let model: THREE.Group | null = null
 const CROSSFADE_S = 0.4
@@ -70,17 +70,17 @@ onMounted(() => {
     return
   }
 
-  const lesson = useLesson(
+  const labScene = useLabScene(
     canvasRef as Ref<HTMLCanvasElement>,
     containerRef as Ref<HTMLDivElement>,
     { antialias: true, alpha: true },
   )
-  const { camera, scene, gui } = lesson
-  renderer = lesson.renderer
-  controls = lesson.controls
-  disposeLesson = lesson.disposeLesson
+  const { camera, scene, gui } = labScene
+  renderer = labScene.renderer
+  controls = labScene.controls
+  disposeScene = labScene.disposeScene
 
-  // The lesson GUI has no place on the home page.
+  // The Lab's GUI has no place on the home page.
   gui.destroy()
 
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -117,7 +117,7 @@ onMounted(() => {
   keyLight.position.set(-2, 4, 3)
   scene.add(keyLight)
 
-  // A narrower lens than the lesson default keeps the head from bulging.
+  // A narrower lens than the Lab default keeps the head from bulging.
   camera.fov = 32
   camera.updateProjectionMatrix()
 
@@ -203,7 +203,7 @@ onMounted(() => {
 onUnmounted(() => {
   cancelAnimationFrame(animationId)
   detachTouch?.()
-  disposeLesson?.()
+  disposeScene?.()
   controls?.dispose()
   mixer?.stopAllAction()
   model?.traverse((child) => {

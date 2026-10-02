@@ -14,13 +14,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 
 definePageMeta({
-  layout: "lessons",
+  layout: 'lab',
 });
 
-useLessonSeo('24')
+useLabSeo('environment-map')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
@@ -34,11 +34,11 @@ let gui
 onMounted(() => {
   if (!canvasRef.value || !containerRef.value) return
 
-  const lessonData = useLesson(canvasRef, containerRef)
-  const { camera, scene, renderer: lessonRenderer, controls: lessonControls, gui: lessonGui, textureLoader } = lessonData
-  renderer = lessonRenderer
-  controls = lessonControls
-  gui = lessonGui
+  const sceneData = useLabScene(canvasRef, containerRef)
+  const { camera, scene, renderer: sceneRenderer, controls: sceneControls, gui: sceneGui, textureLoader } = sceneData
+  renderer = sceneRenderer
+  controls = sceneControls
+  gui = sceneGui
 
   const gltfLoader = new GLTFLoader()
   let pendingAssets = 2

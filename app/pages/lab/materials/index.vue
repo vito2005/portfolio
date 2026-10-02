@@ -7,13 +7,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 
 definePageMeta({
-  layout: "lessons",
+  layout: 'lab',
 });
 
-useLessonSeo('11')
+useLabSeo('materials')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
@@ -23,7 +23,7 @@ let animationId = 0
 let renderer = null
 let controls = null
 let gui = null
-let disposeLesson = null
+let disposeScene = null
 let environmentTexture = null
 let material = null
 const geometries = []
@@ -31,12 +31,12 @@ const geometries = []
 onMounted(() => {
   if (!canvasRef.value || !containerRef.value) return
 
-  const lessonData = useLesson(canvasRef, containerRef)
-  const { camera, scene, hdrLoader } = lessonData
-  renderer = lessonData.renderer
-  controls = lessonData.controls
-  gui = lessonData.gui
-  disposeLesson = lessonData.disposeLesson
+  const sceneData = useLabScene(canvasRef, containerRef)
+  const { camera, scene, hdrLoader } = sceneData
+  renderer = sceneData.renderer
+  controls = sceneData.controls
+  gui = sceneData.gui
+  disposeScene = sceneData.disposeScene
 
   /**
    * Environment map
@@ -129,7 +129,7 @@ onUnmounted(() => {
   cancelAnimationFrame(animationId)
   gui?.destroy()
   controls?.dispose()
-  disposeLesson?.()
+  disposeScene?.()
   for (const geometry of geometries) {
     geometry.dispose()
   }

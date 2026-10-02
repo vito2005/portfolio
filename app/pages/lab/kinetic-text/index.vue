@@ -16,19 +16,19 @@ import * as THREE from 'three'
 import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type GUI from 'lil-gui'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 import {
   createKineticText,
   knockLetter,
   updateKineticLetters,
   type KineticText,
-} from '@/composables/three-js-lessons/kineticText'
+} from '@/composables/lab/kineticText'
 
 definePageMeta({
-  layout: 'lessons',
+  layout: 'lab',
 })
 
-useLessonSeo('50')
+useLabSeo('kinetic-text')
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -41,7 +41,7 @@ let renderer: THREE.WebGLRenderer | null = null
 let controls: OrbitControls | null = null
 let gui: GUI | null = null
 let kineticText: KineticText | null = null
-let disposeLesson: (() => void) | null = null
+let disposeScene: (() => void) | null = null
 let detachListeners: (() => void) | null = null
 
 type FontName = 'Sora' | 'Helvetiker'
@@ -102,13 +102,13 @@ onMounted(() => {
 
   // Hard vector edges against a flat background — this is the one scene here
   // where MSAA is the difference between crisp and cheap-looking.
-  const lesson = useLesson(canvasRef, containerRef, { antialias: true })
-  const { camera, scene } = lesson
+  const labScene = useLabScene(canvasRef, containerRef, { antialias: true })
+  const { camera, scene } = labScene
 
-  renderer = lesson.renderer
-  controls = lesson.controls
-  gui = lesson.gui
-  disposeLesson = lesson.disposeLesson
+  renderer = labScene.renderer
+  controls = labScene.controls
+  gui = labScene.gui
+  disposeScene = labScene.disposeScene
 
   scene.background = new THREE.Color(PAGE_BACKGROUND)
 
@@ -187,7 +187,7 @@ onMounted(() => {
 
   /**
    * Pointer position is normalised against the canvas rect, not the window —
-   * the canvas is an inset box inside the lessons layout.
+   * the canvas is an inset box inside the lab layout.
    */
   const handlePointerMove = (event: PointerEvent) => {
     const rect = canvas.getBoundingClientRect()
@@ -217,7 +217,7 @@ onMounted(() => {
   canvas.addEventListener('pointermove', handlePointerMove)
   canvas.addEventListener('pointerdown', handlePointerMove)
   canvas.addEventListener('pointerleave', handlePointerLeave)
-  // Runs after useLesson's own resize listener, so camera.aspect is already current.
+  // Runs after useLabScene's own resize listener, so camera.aspect is already current.
   window.addEventListener('resize', handleResize)
 
   detachListeners = () => {
@@ -266,7 +266,7 @@ onMounted(() => {
   lookFolder.close()
 
   for (const name of Object.keys(FONT_URLS) as FontName[]) {
-    lesson.fontLoader.load(
+    labScene.fontLoader.load(
       FONT_URLS[name],
       (font) => {
         fonts[name] = font
@@ -341,7 +341,7 @@ onUnmounted(() => {
   gui?.destroy()
   controls?.dispose()
   kineticText?.dispose()
-  disposeLesson?.()
+  disposeScene?.()
   renderer?.dispose()
 })
 </script>

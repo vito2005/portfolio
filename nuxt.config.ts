@@ -54,9 +54,30 @@ export default defineNuxtConfig({
     currencyKey: process.env.CURRENCY_API_KEY
   },
   css: ['~/assets/css/tailwind.css'],
-  // The About page became a section of the home page; keep shared links working.
   routeRules: {
+    // The About page became a section of the home page; keep shared links working.
     '/about': { redirect: { to: '/#about', statusCode: 301 } },
     '/ru/about': { redirect: { to: '/ru#about', statusCode: 301 } },
+    // The Lab used to live at /lessons/<course exercise number>-<slug>.
+    ...labRedirects(),
   },
 })
+
+/** 301s from the old /lessons URLs (en and /ru) to /lab/<slug>. */
+function labRedirects() {
+  const moves: Record<string, string> = {
+    '': '',
+    '/11-materials': '/materials',
+    '/12-text': '/3d-text',
+    '/16-haunted-house': '/haunted-house',
+    '/24-environment-map': '/environment-map',
+    '/50-kinetic-text': '/kinetic-text',
+  }
+  const rules: Record<string, { redirect: { to: string, statusCode: 301 } }> = {}
+  for (const prefix of ['', '/ru']) {
+    for (const [from, to] of Object.entries(moves)) {
+      rules[`${prefix}/lessons${from}`] = { redirect: { to: `${prefix}/lab${to}`, statusCode: 301 } }
+    }
+  }
+  return rules
+}

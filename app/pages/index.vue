@@ -49,7 +49,7 @@
       <SectionTitle>
         {{ $t('home.lab_title') }}
         <template #aside>
-          <NuxtLink :to="localePath('/lessons')" class="link text-ink">{{ $t('home.lab_all') }}</NuxtLink>
+          <NuxtLink :to="localePath('/lab')" class="link text-ink">{{ $t('home.lab_all') }}</NuxtLink>
         </template>
       </SectionTitle>
       <p class="mt-4 max-w-[60ch] leading-relaxed text-ink-soft">{{ $t('home.lab_text') }}</p>
@@ -60,22 +60,22 @@
           :class="isLabSliderActive ? 'keen-slider mx-6 !w-auto !overflow-visible' : 'flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:px-0'"
         >
           <li
-            v-for="lesson in lessons"
-            :key="lesson.id"
+            v-for="experiment in homeExperiments"
+            :key="experiment.slug"
             :class="isLabSliderActive ? 'keen-slider__slide !overflow-visible' : 'w-64 flex-none snap-start sm:w-auto'"
           >
-            <NuxtLink :to="localePath(lesson.path)" class="group block">
+            <NuxtLink :to="localePath(labExperimentPath(experiment))" class="group block">
               <PreviewMedia
-                :src="`/images/lab/${lesson.id}.webp`"
-                :alt="pick(lesson.title)"
+                :src="labExperimentImage(experiment)"
+                :alt="pick(experiment.title)"
                 :width="800"
                 :height="450"
-                :video="lesson.video"
+                :video="labExperimentVideo(experiment)"
                 :lazy="false"
                 class="aspect-video w-full rounded-xl border border-line transition-colors group-hover:border-ink-mute"
               />
-              <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ pick(lesson.title) }}</p>
-              <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ pick(lesson.description) }}</p>
+              <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ pick(experiment.title) }}</p>
+              <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ pick(experiment.description) }}</p>
             </NuxtLink>
           </li>
         </ul>
@@ -113,7 +113,8 @@
 <script setup lang="ts">
 import { featuredProjects } from '@/data/projects'
 import { aboutFacts, aboutIntro, channels } from '@/data/profile'
-import { useLessons, type Lesson } from '@/composables/three-js-lessons/useLessons'
+import type { LabExperiment } from '@/data/types'
+import { findLabExperiment, labExperimentImage, labExperimentPath, labExperimentVideo } from '@/data/lab'
 
 // The page ends with ContactSection, so the footer drops its own contact links.
 definePageMeta({ hasContactSection: true })
@@ -128,10 +129,9 @@ const { t } = useI18n()
 const HERO_STACK = ['Vue', 'Svelte', 'Node.js', 'Go', 'Three.js']
 
 const featured = featuredProjects()
-const { getLessonById } = useLessons()
 // A hand-picked four for the home page, strongest first; the full list lives on the lab page.
 // From sm up they sit 2×2: in a row of four the clips were ~250px wide and got lost.
-const HOME_LESSON_IDS = ['50', '24', '16', '11']
+const HOME_EXPERIMENT_SLUGS = ['kinetic-text', 'environment-map', 'haunted-house', 'materials']
 
 // Phones: the lab row is a keen-slider (inertia, vertical swipes left to the page, first
 // tile on the page padding). The wrapper bleeds to the screen edges and clips; the row
@@ -143,9 +143,9 @@ const { isActive: isLabSliderActive } = useMobileSlider(labSliderRef, {
   dragSpeed: 0.9,
   slides: { perView: 1.25, spacing: 16 },
 })
-const lessons = HOME_LESSON_IDS
-  .map(id => getLessonById(id))
-  .filter((lesson): lesson is Lesson => Boolean(lesson))
+const homeExperiments = HOME_EXPERIMENT_SLUGS
+  .map(slug => findLabExperiment(slug))
+  .filter((experiment): experiment is LabExperiment => Boolean(experiment))
 
 usePageSeo({
   title: t('seo.home_title'),

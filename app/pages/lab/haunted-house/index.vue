@@ -14,13 +14,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 import { Sky } from 'three/addons/objects/Sky.js'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 
 definePageMeta({
-  layout: "lessons",
+  layout: 'lab',
 });
 
-useLessonSeo('16')
+useLabSeo('haunted-house')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
@@ -35,11 +35,11 @@ let initialLoadTimeoutId
 onMounted(() => {
   if (!canvasRef.value || !containerRef.value) return
 
-  const lessonData = useLesson(canvasRef, containerRef)
-  const { camera, scene, renderer: lessonRenderer, controls: lessonControls, gui: lessonGui, textureLoader } = lessonData
-  renderer = lessonRenderer
-  controls = lessonControls
-  gui = lessonGui
+  const sceneData = useLabScene(canvasRef, containerRef)
+  const { camera, scene, renderer: sceneRenderer, controls: sceneControls, gui: sceneGui, textureLoader } = sceneData
+  renderer = sceneRenderer
+  controls = sceneControls
+  gui = sceneGui
 
   let pendingTextures = 5
   const markTextureLoaded = () => {

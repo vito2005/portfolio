@@ -8,13 +8,13 @@
 import { ref, onMounted } from 'vue'
 import * as THREE from 'three'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { useLesson } from '@/composables/three-js-lessons/useLesson'
+import { useLabScene } from '@/composables/lab/useLabScene'
 
 definePageMeta({
-  layout: "lessons",
+  layout: 'lab',
 });
 
-useLessonSeo('12')
+useLabSeo('3d-text')
 
 const canvasRef = ref(null)
 const containerRef = ref(null)
@@ -38,8 +38,8 @@ const parameters = {
 onMounted(() => {
   if (!canvasRef.value) return
 
-  const lessonData = useLesson(canvasRef, containerRef)
-  const { camera, scene, textureLoader, fontLoader, controls, renderer, gui } = lessonData
+  const sceneData = useLabScene(canvasRef, containerRef)
+  const { camera, scene, textureLoader, fontLoader, controls, renderer, gui } = sceneData
 
   const matcapTextures = new Array(8).fill(null)
 

@@ -19,7 +19,7 @@
 import { contacts } from '@/data/profile'
 
 /**
- * compact: one short line for the full-screen lesson shell, where every pixel of
+ * compact: one short line for the full-screen Lab shell, where every pixel of
  * height goes to the canvas; phones drop the contact links there.
  */
 const { compact = false } = defineProps<{ compact?: boolean }>()

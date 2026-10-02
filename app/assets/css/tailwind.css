@@ -38,7 +38,7 @@
   .card {
     @apply rounded-xl border border-line bg-surface p-6;
   }
-  /* One page width for every route; the lessons layout is the exception because the canvas needs the full box. */
+  /* One page width for every route; the lab layout is the exception because the canvas needs the full box. */
   .page {
     @apply mx-auto w-full max-w-6xl px-6;
   }
