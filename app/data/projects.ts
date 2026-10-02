@@ -104,7 +104,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'mail-ru',
-    title: 'Mail.ru main page',
+    title: 'Mail.ru',
     kind: 'work',
     featured: true,
     company: 'VK',

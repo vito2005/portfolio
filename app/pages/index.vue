@@ -67,14 +67,14 @@
             <NuxtLink :to="localePath(lesson.path)" class="group block">
               <PreviewMedia
                 :src="`/images/lab/${lesson.id}.webp`"
-                :alt="lesson.title"
+                :alt="pick(lesson.title)"
                 :width="800"
                 :height="450"
                 :video="lesson.video"
                 class="aspect-video w-full rounded-xl border border-line transition-colors group-hover:border-ink-mute"
               />
-              <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ lesson.title }}</p>
-              <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ lesson.description }}</p>
+              <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ pick(lesson.title) }}</p>
+              <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ pick(lesson.description) }}</p>
             </NuxtLink>
           </li>
         </ul>

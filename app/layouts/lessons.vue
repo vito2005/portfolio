@@ -51,7 +51,9 @@ const route = useRoute()
 const router = useRouter()
 const { getAllLessons } = useLessons()
 
-const allLessons = computed(() => getAllLessons())
+const { pick } = useLocalized()
+// The dropdown reads plain strings, so titles are picked for the current locale here.
+const allLessons = computed(() => getAllLessons().map(lesson => ({ ...lesson, title: pick(lesson.title) })))
 const selectedLessonId = computed(() => route.params.id || null)
 
 // Canvas lessons need the fixed h-screen box (that chain is what sizes the canvas).

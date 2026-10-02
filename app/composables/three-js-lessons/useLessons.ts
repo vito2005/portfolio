@@ -1,7 +1,9 @@
+import type { Localized } from '@/data/types'
+
 export interface Lesson {
     id: string
-    title: string
-    description: string
+    title: Localized
+    description: Localized
     order: number
     path: string
     type: 'threejs' | 'other'
@@ -17,8 +19,8 @@ export const useLessons = () => {
     const lessons: Lesson[] = [
         {
             id: '11',
-            title: 'Materials',
-            description: 'Creating and using materials in Three.js',
+            title: { en: 'Materials', ru: 'Материалы' },
+            description: { en: 'Physical materials in Three.js: metal, glass and transmission', ru: 'Физические материалы в Three.js: металл, стекло, прозрачность' },
             order: 11,
             path: '/lessons/11-materials',
             type: 'threejs',
@@ -26,8 +28,8 @@ export const useLessons = () => {
         },
         {
             id: '12',
-            title: '3D Text',
-            description: 'Creating 3D text with Three.js',
+            title: { en: '3D Text', ru: '3D-текст' },
+            description: { en: 'Extruded 3D type with Three.js', ru: 'Объёмный текст на Three.js' },
             order: 12,
             path: '/lessons/12-text',
             type: 'threejs',
@@ -35,8 +37,8 @@ export const useLessons = () => {
         },
         {
             id: '16',
-            title: 'Haunted House',
-            description: 'Building a haunted house scene with textures, lights, shadows and fog',
+            title: { en: 'Haunted House', ru: 'Дом с привидениями' },
+            description: { en: 'A haunted house scene with textures, lights, shadows and fog', ru: 'Сцена с текстурами, светом, тенями и туманом' },
             order: 16,
             path: '/lessons/16-haunted-house',
             type: 'threejs',
@@ -44,8 +46,8 @@ export const useLessons = () => {
         },
         {
             id: '24',
-            title: 'Environment Map',
-            description: 'Environment maps and HDR lighting in Three.js',
+            title: { en: 'Environment Map', ru: 'Карта окружения' },
+            description: { en: 'Environment maps and HDR lighting in Three.js', ru: 'Карты окружения и HDR-освещение в Three.js' },
             order: 24,
             path: '/lessons/24-environment-map',
             type: 'threejs',
@@ -53,8 +55,8 @@ export const useLessons = () => {
         },
         {
             id: '50',
-            title: 'Kinetic Text',
-            description: 'Extruded per-letter type that scatters on hover and springs back into the headline',
+            title: { en: 'Kinetic Text', ru: 'Кинетический текст' },
+            description: { en: 'Extruded per-letter type that scatters on hover and springs back into the headline', ru: 'Объёмные буквы разлетаются от курсора и пружиной возвращаются в заголовок' },
             order: 50,
             path: '/lessons/50-kinetic-text',
             type: 'threejs',

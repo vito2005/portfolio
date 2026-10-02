@@ -5,7 +5,7 @@
   >
     <PreviewMedia
       :src="`/images/lab/${lesson.id}.webp`"
-      :alt="lesson.title"
+      :alt="pick(lesson.title)"
       :width="800"
       :height="450"
       :video="lesson.video"
@@ -13,9 +13,9 @@
     />
     <div class="p-6">
       <h2 class="font-serif text-xl tracking-tight text-ink transition-colors group-hover:text-accent-deep">
-        {{ lesson.title }}
+        {{ pick(lesson.title) }}
       </h2>
-      <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ lesson.description }}</p>
+      <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ pick(lesson.description) }}</p>
     </div>
   </NuxtLink>
 </template>
@@ -26,4 +26,5 @@ import type { Lesson } from '@/composables/three-js-lessons/useLessons'
 defineProps<{ lesson: Lesson }>()
 
 const localePath = useLocalePath()
+const { pick } = useLocalized()
 </script>
