@@ -60,7 +60,7 @@
   },
   "lab": {
     "title": "Lab",
-    "subtitle": "Three.js experiments. Some follow the Bruno Simon course, the later ones are my own.",
+    "subtitle": "WebGL experiments in Three.js: materials, light, environment maps, kinetic type. Every scene can be orbited and tweaked.",
     "select": "Choose an experiment",
     "experiment": "Experiment",
     "open": "Open",

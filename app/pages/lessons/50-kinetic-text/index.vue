@@ -110,10 +110,6 @@ onMounted(() => {
   gui = lesson.gui
   disposeLesson = lesson.disposeLesson
 
-  gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
-
   scene.background = new THREE.Color(PAGE_BACKGROUND)
 
   // Well under the shared 75° default: a long lens keeps the headline's own

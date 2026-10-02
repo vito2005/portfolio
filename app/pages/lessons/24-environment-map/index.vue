@@ -50,10 +50,6 @@ onMounted(() => {
     }
   }
 
-  gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
-
   scene.environmentIntensity = 1
   scene.backgroundBlurriness = 0
   scene.backgroundIntensity = 1

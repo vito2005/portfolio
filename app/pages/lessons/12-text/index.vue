@@ -41,10 +41,6 @@ onMounted(() => {
   const lessonData = useLesson(canvasRef, containerRef)
   const { camera, scene, textureLoader, fontLoader, controls, renderer, gui } = lessonData
 
-  gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
-
   const matcapTextures = new Array(8).fill(null)
 
   textureLoader.load('/textures/matcaps/8.png', (texture) => {

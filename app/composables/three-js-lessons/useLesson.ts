@@ -39,6 +39,15 @@ export const useLesson = (
      * GUI
      */
     const gui = new GUI({ container })
+    // Pinned to the canvas's top-right corner (the container is `relative`).
+    gui.domElement.style.position = 'absolute'
+    gui.domElement.style.top = '0'
+    gui.domElement.style.right = '0'
+    // On phones the open panel covers a third of the scene: start it collapsed,
+    // one tap on "Controls" opens it. Same breakpoint as Tailwind's `sm`.
+    if (window.matchMedia('(max-width: 639px)').matches) {
+        gui.close()
+    }
 
 
     /**

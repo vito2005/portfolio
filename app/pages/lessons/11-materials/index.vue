@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
 import { useLesson } from '@/composables/three-js-lessons/useLesson'
 
@@ -18,22 +18,31 @@ useLessonSeo('11')
 const canvasRef = ref(null)
 const containerRef = ref(null)
 
-let animationId
+// Three.js handles stay plain `let` (not refs) so onUnmounted can tear them down.
+let animationId = 0
+let renderer = null
+let controls = null
+let gui = null
+let disposeLesson = null
+let environmentTexture = null
+let material = null
+const geometries = []
 
 onMounted(() => {
-  if (!canvasRef.value) return
+  if (!canvasRef.value || !containerRef.value) return
 
   const lessonData = useLesson(canvasRef, containerRef)
-  const { camera, scene, controls, renderer, gui, hdrLoader } = lessonData
-
-  gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
+  const { camera, scene, hdrLoader } = lessonData
+  renderer = lessonData.renderer
+  controls = lessonData.controls
+  gui = lessonData.gui
+  disposeLesson = lessonData.disposeLesson
 
   /**
    * Environment map
    */
   hdrLoader.load('/textures/environmentMap/2k.hdr', (environmentMap) => {
+    environmentTexture = environmentMap
     environmentMap.mapping = THREE.EquirectangularReflectionMapping
 
     scene.background = environmentMap
@@ -44,10 +53,13 @@ onMounted(() => {
    * MeshPhysicalMaterial
    */
   // Base material
-  const material = new THREE.MeshPhysicalMaterial()
+  material = new THREE.MeshPhysicalMaterial()
   material.metalness = 0
   material.roughness = 0.15
-  material.side = THREE.DoubleSide
+  // FrontSide on purpose: a double-sided transmissive material makes three render
+  // its back faces into the very transmission buffer it samples, and WebGL floods
+  // the console with "feedback loop" errors. The plane gets a mirrored twin below.
+  material.side = THREE.FrontSide
 
   gui.add(material, 'metalness').min(0).max(1).step(0.0001)
   gui.add(material, 'roughness').min(0).max(1).step(0.0001)
@@ -62,21 +74,22 @@ onMounted(() => {
   gui.add(material, 'thickness').min(0).max(1).step(0.0001)
 
   // Objects
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 64, 64),
-    material
-  )
+  const sphereGeometry = new THREE.SphereGeometry(0.5, 64, 64)
+  const planeGeometry = new THREE.PlaneGeometry(1, 1, 100, 100)
+  const torusGeometry = new THREE.TorusGeometry(0.3, 0.2, 64, 128)
+  geometries.push(sphereGeometry, planeGeometry, torusGeometry)
+
+  const sphere = new THREE.Mesh(sphereGeometry, material)
   sphere.position.x = - 1.5
 
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1, 100, 100),
-    material
-  )
+  const plane = new THREE.Mesh(planeGeometry, material)
+  // The plane's back face: a copy turned half a circle, so the glass sheet stays
+  // visible from both sides while the material itself is single-sided.
+  const planeBack = new THREE.Mesh(planeGeometry, material)
+  planeBack.rotation.y = Math.PI
+  plane.add(planeBack)
 
-  const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(0.3, 0.2, 64, 128),
-    material
-  )
+  const torus = new THREE.Mesh(torusGeometry, material)
   torus.position.x = 1.5
 
   scene.add(sphere, plane, torus)
@@ -106,25 +119,22 @@ onMounted(() => {
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+    animationId = window.requestAnimationFrame(tick)
   }
 
   tick()
+})
 
-  return () => {
-    if (animationId) {
-      cancelAnimationFrame(animationId)
-    }
-    if (gui) {
-      gui.destroy()
-    }
-    if (controls) {
-      controls.dispose()
-    }
-    if (renderer) {
-      renderer.dispose()
-    }
+onUnmounted(() => {
+  cancelAnimationFrame(animationId)
+  gui?.destroy()
+  controls?.dispose()
+  disposeLesson?.()
+  for (const geometry of geometries) {
+    geometry.dispose()
   }
-
+  material?.dispose()
+  environmentTexture?.dispose()
+  renderer?.dispose()
 })
 </script>

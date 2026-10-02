@@ -54,10 +54,6 @@ onMounted(() => {
     isLoading.value = false
   }, 8000)
 
-  gui.domElement.style.position = 'absolute'
-  gui.domElement.style.top = '0'
-  gui.domElement.style.right = '0'
-
   /**
    * Textures
    */
