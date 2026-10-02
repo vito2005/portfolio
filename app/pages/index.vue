@@ -56,7 +56,7 @@
       <div class="-mx-6 mt-10 overflow-hidden sm:mx-0 sm:overflow-visible">
         <ul
           ref="labSliderRef"
-          class="sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
+          class="sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10"
           :class="isLabSliderActive ? 'keen-slider mx-6 !w-auto !overflow-visible' : 'flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:px-0'"
         >
           <li
@@ -130,6 +130,7 @@ const HERO_STACK = ['Vue', 'Svelte', 'Node.js', 'Go', 'Three.js']
 const featured = featuredProjects()
 const { getLessonById } = useLessons()
 // A hand-picked four for the home page, strongest first; the full list lives on the lab page.
+// From sm up they sit 2×2: in a row of four the clips were ~250px wide and got lost.
 const HOME_LESSON_IDS = ['50', '24', '16', '11']
 
 // Phones: the lab row is a keen-slider (inertia, vertical swipes left to the page, first

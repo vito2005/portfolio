@@ -26,7 +26,7 @@
     "about_title": "About",
     "experience_title": "Where I have worked",
     "lab_title": "Lab",
-    "lab_text": "Three.js experiments from the Bruno Simon course and my own: kinetic type, physics, lighting, environment maps. Rough by design, this is where the 3D work gets practiced.",
+    "lab_text": "WebGL experiments in Three.js: kinetic type, materials, light and shadow, environment maps. This is where I try ideas out before they reach real projects.",
     "lab_all": "Open the lab",
     "channels": "I also run a channel on {telegram} and {youtube}.",
     "experience_early": "{years}: full-stack work in product teams, Node and Vue."
