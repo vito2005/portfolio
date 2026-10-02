@@ -39,7 +39,7 @@ export const findLabExperiment = (slug: string): LabExperiment | undefined =>
 /** Unlocalized route; pass it through `localePath()` for links. */
 export const labExperimentPath = (experiment: LabExperiment): string => `/lab/${experiment.slug}`
 
-/** Tile still, also the share preview. */
+/** Tile still for the Lab cards and the home row. */
 export const labExperimentImage = (experiment: LabExperiment): string => `/images/lab/${experiment.slug}.webp`
 
 /** Tile clip without extension: PreviewMedia adds `.webm` and `.mp4`. */

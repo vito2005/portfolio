@@ -145,6 +145,8 @@ const homeExperiments = HOME_EXPERIMENT_SLUGS
   .map(slug => findLabExperiment(slug))
   .filter((experiment): experiment is LabExperiment => Boolean(experiment))
 
+usePersonSchema()
+
 usePageSeo({
   title: t('seo.home_title'),
   // The visible title has no full stop; the meta description needs one between sentences.

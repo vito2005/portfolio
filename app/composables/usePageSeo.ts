@@ -2,8 +2,11 @@ export interface PageSeoOptions {
   title: string
   description: string
   type?: 'website' | 'article'
-  /** Absolute path under `public/`; defaults to the site-wide OG image. */
-  image?: string
+  /**
+   * Share card made by `npm run og` (tools/og/generate.ts): `public/og/<card>-<locale>.jpg`,
+   * e.g. `projects/hemi`. Defaults to the home card.
+   */
+  card?: string
 }
 
 /**
@@ -11,14 +14,14 @@ export interface PageSeoOptions {
  * The origin comes from the request so the same code works on abuki.dev and
  * on localhost; nothing here is hard-coded to a domain.
  */
-export const usePageSeo = ({ title, description, type = 'website', image = '/og-image.png' }: PageSeoOptions) => {
+export const usePageSeo = ({ title, description, type = 'website', card = 'home' }: PageSeoOptions) => {
   const route = useRoute()
   const url = useRequestURL()
   const { locale, locales, t } = useI18n()
   const switchLocalePath = useSwitchLocalePath()
 
   const canonicalUrl = url.origin + route.path
-  const imageUrl = url.origin + image
+  const imageUrl = `${url.origin}/og/${card}-${locale.value}.jpg`
 
   const alternateLinks = locales.value.map(entry => ({
     rel: 'alternate',
@@ -36,12 +39,18 @@ export const usePageSeo = ({ title, description, type = 'website', image = '/og-
       { property: 'og:description', content: description },
       { property: 'og:url', content: canonicalUrl },
       { property: 'og:image', content: imageUrl },
+      // Size up front, so messengers lay out the large preview before fetching the image.
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+      { property: 'og:image:type', content: 'image/jpeg' },
+      { property: 'og:image:alt', content: title },
       { property: 'og:site_name', content: t('seo.name') },
       { property: 'og:locale', content: locale.value === 'ru' ? 'ru_RU' : 'en_US' },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: imageUrl },
+      { name: 'twitter:image:alt', content: title },
     ],
     link: [
       { rel: 'canonical', href: canonicalUrl },

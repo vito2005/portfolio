@@ -25,5 +25,6 @@ const groups = computed(() => [
 usePageSeo({
   title: `${t('projects.title')} | ${t('seo.name')}`,
   description: t('projects.intro'),
+  card: 'projects',
 })
 </script>

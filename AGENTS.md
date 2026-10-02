@@ -10,7 +10,8 @@ npm run dev        # dev server on http://localhost:3000
 npm run lint       # nuxt prepare && eslint .  ← the only automated gate
 npm run build      # production build (Nitro node server)
 npm run preview    # preview the built server
-npm start          # what Railway runs: node .output/server/index.mjs
+npm start          # what the server runs: node .output/server/index.mjs
+npm run og         # regenerate the share cards (see below)
 ```
 
 `npm run lint` is the **only** check in this repo — there are no unit tests, no
@@ -162,6 +163,23 @@ links through `usePageSeo({ title, description })`; Lab experiments call
 `useLabSeo('<slug>')`, which builds them from `app/data/lab.ts` in the current
 locale. The origin comes from `useRequestURL()` — don't hard-code it: the site
 runs on abuki.dev and locally on the dev port.
+
+## Share cards (Open Graph)
+
+Every page's preview image is a JPEG in `public/og/` (`home-ru.jpg`,
+`projects/<slug>-en.jpg`, `lab/<slug>-ru.jpg`, …), made by `tools/og/generate.ts`
+and committed. `usePageSeo({ card })` picks the right one for the locale.
+After changing a title, tagline, cover, the hero copy or the avatar scene,
+regenerate them with the dev server running on `:3010`:
+
+```bash
+npm run og                 # the light set, the site's look
+OG_THEME=dark npm run og   # the dark set
+```
+
+A new project or Lab experiment gets its card from the same run; nothing to
+register. `sitemap.xml` and `robots.txt` are server routes built from the same
+data, so they need no edits either.
 
 ## TypeScript
 

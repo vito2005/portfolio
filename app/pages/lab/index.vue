@@ -18,5 +18,6 @@ const { t } = useI18n()
 usePageSeo({
   title: `${t('lab.title')} | ${t('seo.name')}`,
   description: t('lab.subtitle'),
+  card: 'lab',
 })
 </script>
