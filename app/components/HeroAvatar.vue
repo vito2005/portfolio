@@ -31,6 +31,39 @@ let disposeLesson: (() => void) | null = null
 let mixer: THREE.AnimationMixer | null = null
 let model: THREE.Group | null = null
 const CROSSFADE_S = 0.4
+let detachTouch: (() => void) | null = null
+
+// iOS Safari can still turn a long horizontal swipe that drifts up or down into a page
+// scroll, despite pan-y. So the direction is decided once per swipe, the way the browser
+// does it, and a horizontal swipe keeps its touchmoves (same approach as useWebglSwipePan
+// in the tekta project).
+const SWIPE_THRESHOLD_PX = 10
+let touchStart: { x: number, y: number } | null = null
+let swipeDirection: 'unknown' | 'horizontal' | 'vertical' = 'unknown'
+
+function handleTouchStart(event: TouchEvent) {
+  const touch = event.touches[0]
+  touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null
+  swipeDirection = 'unknown'
+}
+
+function handleTouchMove(event: TouchEvent) {
+  const touch = event.touches[0]
+  if (!touchStart || !touch) {
+    return
+  }
+  if (swipeDirection === 'unknown') {
+    const dx = touch.clientX - touchStart.x
+    const dy = touch.clientY - touchStart.y
+    if (Math.hypot(dx, dy) < SWIPE_THRESHOLD_PX) {
+      return
+    }
+    swipeDirection = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
+  }
+  if (swipeDirection === 'horizontal' && event.cancelable) {
+    event.preventDefault()
+  }
+}
 
 onMounted(() => {
   if (!canvasRef.value || !containerRef.value) {
@@ -62,6 +95,19 @@ onMounted(() => {
   // Keep the character upright: no looking at it from below or from the top.
   controls.minPolarAngle = Math.PI * 0.35
   controls.maxPolarAngle = Math.PI * 0.6
+
+  // Phones: a vertical swipe over the avatar has to scroll the page, not spin the model.
+  // OrbitControls sets touch-action: none on the canvas; pan-y gives vertical pans back to
+  // the browser (OrbitControls gets pointercancel once the page starts scrolling) and keeps
+  // horizontal swipes for turning the model.
+  const canvas = canvasRef.value
+  canvas.style.touchAction = 'pan-y'
+  canvas.addEventListener('touchstart', handleTouchStart, { passive: true })
+  canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+  detachTouch = () => {
+    canvas.removeEventListener('touchstart', handleTouchStart)
+    canvas.removeEventListener('touchmove', handleTouchMove)
+  }
 
   // Soft sky/ground fill plus one key light from the front-left, so the flat
   // chibi materials still read as volumes.
@@ -156,6 +202,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   cancelAnimationFrame(animationId)
+  detachTouch?.()
   disposeLesson?.()
   controls?.dispose()
   mixer?.stopAllAction()

@@ -53,22 +53,32 @@
         </template>
       </SectionTitle>
       <p class="mt-4 max-w-[60ch] leading-relaxed text-ink-soft">{{ $t('home.lab_text') }}</p>
-      <ul class="-mx-6 mt-10 flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:px-0 lg:grid-cols-4">
-        <li v-for="lesson in lessons" :key="lesson.id" class="w-64 flex-none snap-start sm:w-auto">
-          <NuxtLink :to="localePath(lesson.path)" class="group block">
-            <PreviewMedia
-              :src="`/images/lab/${lesson.id}.webp`"
-              :alt="lesson.title"
-              :width="800"
-              :height="450"
-              :video="lesson.video"
-              class="aspect-video w-full rounded-xl border border-line transition-colors group-hover:border-ink-mute"
-            />
-            <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ lesson.title }}</p>
-            <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ lesson.description }}</p>
-          </NuxtLink>
-        </li>
-      </ul>
+      <div class="-mx-6 mt-10 overflow-hidden sm:mx-0 sm:overflow-visible">
+        <ul
+          ref="labSliderRef"
+          class="sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
+          :class="isLabSliderActive ? 'keen-slider mx-6 !w-auto !overflow-visible' : 'flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:px-0'"
+        >
+          <li
+            v-for="lesson in lessons"
+            :key="lesson.id"
+            :class="isLabSliderActive ? 'keen-slider__slide !overflow-visible' : 'w-64 flex-none snap-start sm:w-auto'"
+          >
+            <NuxtLink :to="localePath(lesson.path)" class="group block">
+              <PreviewMedia
+                :src="`/images/lab/${lesson.id}.webp`"
+                :alt="lesson.title"
+                :width="800"
+                :height="450"
+                :video="lesson.video"
+                class="aspect-video w-full rounded-xl border border-line transition-colors group-hover:border-ink-mute"
+              />
+              <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ lesson.title }}</p>
+              <p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ lesson.description }}</p>
+            </NuxtLink>
+          </li>
+        </ul>
+      </div>
     </section>
 
     <section id="about" class="scroll-mt-20 grid gap-10 border-t border-line py-16 sm:py-24 lg:grid-cols-12 lg:gap-16">
@@ -120,6 +130,17 @@ const featured = featuredProjects()
 const { getLessonById } = useLessons()
 // A hand-picked four for the home page, strongest first; the full list lives on the lab page.
 const HOME_LESSON_IDS = ['50', '24', '16', '11']
+
+// Phones: the lab row is a keen-slider (inertia, vertical swipes left to the page, first
+// tile on the page padding). The wrapper bleeds to the screen edges and clips; the row
+// itself keeps the content width (keen-slider's CSS sets width: 100%, hence !w-auto next
+// to mx-6) so the next tile peeks in from the right.
+const labSliderRef = ref<HTMLElement | null>(null)
+const { isActive: isLabSliderActive } = useMobileSlider(labSliderRef, {
+  mode: 'free',
+  dragSpeed: 0.9,
+  slides: { perView: 1.25, spacing: 16 },
+})
 const lessons = HOME_LESSON_IDS
   .map(id => getLessonById(id))
   .filter((lesson): lesson is Lesson => Boolean(lesson))
