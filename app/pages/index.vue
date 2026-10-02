@@ -71,6 +71,7 @@
                 :width="800"
                 :height="450"
                 :video="lesson.video"
+                :lazy="false"
                 class="aspect-video w-full rounded-xl border border-line transition-colors group-hover:border-ink-mute"
               />
               <p class="mt-3 font-medium text-ink transition-colors group-hover:text-accent-deep">{{ pick(lesson.title) }}</p>

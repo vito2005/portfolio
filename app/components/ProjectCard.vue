@@ -12,7 +12,7 @@
       :height="720"
       :video="project.video"
       img-position="object-top"
-      class="aspect-[2/1] w-full border-b border-line"
+      class="aspect-[2/1] w-full border-b border-line md:aspect-auto md:h-[calc((min(100vw,72rem)-4.5rem)/4)]"
     />
     <div class="flex flex-1 flex-col p-6">
       <p class="flex flex-wrap justify-between gap-x-4 text-xs text-ink-mute">
@@ -44,4 +44,11 @@ const { pick } = useLocalized()
 // Every cover ships as `<name>.webp` (1440 wide) and `<name>-800.webp` for small cards.
 const cover = computed(() => pick(project.cover))
 const smallCover = computed(() => cover.value.replace(/\.webp$/, '-800.webp'))
+
+// From md up the cover has one height for every card, so a row of a wide and a
+// narrow card (7/5 columns on the home page) lines up instead of leaving a gap
+// under the shorter cover. The height is a quarter of the two cards' combined
+// width: the .page content (min(100vw, 72rem) minus 3rem padding) minus the 1.5rem
+// gap. In two equal columns (/projects) that is exactly 2:1; in 7/5 the wide
+// cover crops a little at the bottom and the narrow one at the sides.
 </script>

@@ -7,7 +7,7 @@
       :alt="alt"
       :width="width"
       :height="height"
-      :loading="eager ? 'eager' : 'lazy'"
+      :loading="eager || !lazy ? 'eager' : 'lazy'"
       :fetchpriority="eager ? 'high' : undefined"
       decoding="async"
       class="h-full w-full object-cover"
@@ -46,6 +46,7 @@ const {
   sizes = undefined,
   video = undefined,
   eager = false,
+  lazy = true,
   imgPosition = 'object-center',
 } = defineProps<{
   src: string
@@ -58,6 +59,12 @@ const {
   video?: string
   /** Above the fold: load the image eagerly with high priority. */
   eager?: boolean
+  /**
+   * false: load the image even while it is off screen. For slides in a carousel:
+   * they sit clipped beside the viewport, and Safari's lazy loading leaves them
+   * blank until they are swiped in.
+   */
+  lazy?: boolean
   /** object-position utility shared by the image and the clip. */
   imgPosition?: string
 }>()
