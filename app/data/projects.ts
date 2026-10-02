@@ -138,7 +138,7 @@ export const projects: Project[] = [
     featured: false,
     company: 'Metamap, San Francisco',
     period: { en: '2022 - 2024', ru: '2022 - 2024' },
-    role: { en: 'Full-stack engineer, Node.js', ru: 'Full-stack инженер, Node.js' },
+    role: { en: 'Full-stack engineer, Node.js', ru: 'Фулстек-инженер, Node.js' },
     tagline: {
       en: 'Microservices for a fintech underwriting platform used by 35 banks in Latin America.',
       ru: 'Микросервисы для финтех-платформы андеррайтинга, которой пользуются 35 банков Латинской Америки.',

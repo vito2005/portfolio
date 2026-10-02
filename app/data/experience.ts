@@ -18,7 +18,7 @@ export const experience: ExperienceEntry[] = [
     company: 'POW',
     url: 'https://proofofwork.studio',
     location: { en: 'London, remote', ru: 'Лондон, удалённо' },
-    role: { en: 'Senior frontend engineer', ru: 'Senior фронтенд-инженер' },
+    role: { en: 'Senior frontend engineer', ru: 'Ведущий фронтенд-инженер' },
     period: { en: '2024 - 2025', ru: '2024 - 2025' },
     summary: {
       en: 'Led the front end of the OSMI.AI ecosystem and built Three.js scenes for hemi.xyz.',
@@ -30,7 +30,7 @@ export const experience: ExperienceEntry[] = [
     company: 'Metamap',
     url: 'https://www.metamap.com',
     location: { en: 'San Francisco, remote', ru: 'Сан-Франциско, удалённо' },
-    role: { en: 'Full-stack engineer', ru: 'Full-stack инженер' },
+    role: { en: 'Full-stack engineer', ru: 'Фулстек-инженер' },
     period: { en: '2022 - 2024', ru: '2022 - 2024' },
     summary: {
       en: 'Node.js microservices for a fintech underwriting platform used by 35 banks in Latin America.',
