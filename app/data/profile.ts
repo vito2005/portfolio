@@ -38,3 +38,9 @@ export const channels = {
   telegram: 'https://t.me/threejsweb',
   youtube: 'https://www.youtube.com/@alexbuki',
 }
+
+/**
+ * The hero's tag row, front-end core first, then the backend and 3D. The laptop
+ * on the hero desk types the same list, so the two never disagree.
+ */
+export const heroStack = ['Vue', 'Svelte', 'Node.js', 'Go', 'Three.js']

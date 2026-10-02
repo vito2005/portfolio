@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { heroStack } from '@/data/profile'
 
 /**
  * The hero's "workplace": a bar-height table on one leg, built
@@ -49,13 +50,16 @@ export function createBarTable(): THREE.Group {
 }
 
 // Short lines in a big font: at hero size the screen is ~80 px wide, so the code has
-// to read as coloured lines first and as text only up close.
+// to read as coloured lines first and as text only up close. The stack is the hero's
+// tag row, two names per line.
+const STACK_LINES = Array.from({ length: Math.ceil(heroStack.length / 2) }, (_, row) =>
+  `    ${heroStack.slice(row * 2, row * 2 + 2).map(name => `'${name}'`).join(', ')},`)
 const CODE_LINES = [
   { text: 'const alex = {', color: '#e6e1d8' },
-  { text: '  role: \'web dev\',', color: '#7fd8b6' },
-  { text: '  stack: [\'Vue\', \'Go\', \'3D\'],', color: '#e6e1d8' },
+  { text: '  stack: [', color: '#e6e1d8' },
+  ...STACK_LINES.map(text => ({ text, color: '#7fd8b6' })),
+  { text: '  ],', color: '#e6e1d8' },
   { text: '}', color: '#e6e1d8' },
-  { text: '', color: '#e6e1d8' },
   { text: 'ship()', color: '#f2c27b' },
 ]
 const TYPE_SPEED = 28 // characters per second

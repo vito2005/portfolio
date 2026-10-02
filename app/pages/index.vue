@@ -17,7 +17,7 @@
           <a href="#contact" class="btn-outline">{{ $t('hero.cta_contact') }}</a>
         </div>
         <ul class="rise rise-delay mt-10 flex flex-wrap gap-2" :aria-label="$t('hero.stack_label')">
-          <li v-for="tech in HERO_STACK" :key="tech">
+          <li v-for="tech in heroStack" :key="tech">
             <TechTag>{{ tech }}</TechTag>
           </li>
         </ul>
@@ -112,7 +112,7 @@
 
 <script setup lang="ts">
 import { featuredProjects } from '@/data/projects'
-import { aboutFacts, aboutIntro, channels } from '@/data/profile'
+import { aboutFacts, aboutIntro, channels, heroStack } from '@/data/profile'
 import type { LabExperiment } from '@/data/types'
 import { findLabExperiment, labExperimentImage, labExperimentPath, labExperimentVideo } from '@/data/lab'
 
@@ -125,8 +125,6 @@ const { t } = useI18n()
 
 // The RU hero title uses a non-breaking hyphen so «Веб‑разработчик» never splits at it;
 // the h1 sizes were measured on the longer «Инженер‑разработчик», so it fits with room.
-// What the hero's tag row shows: the front-end core first, then the backend and 3D.
-const HERO_STACK = ['Vue', 'Svelte', 'Node.js', 'Go', 'Three.js']
 
 const featured = featuredProjects()
 // A hand-picked four for the home page, strongest first; the full list lives on the lab page.
