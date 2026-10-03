@@ -181,6 +181,10 @@ The same script makes the site icons from `public/favicon.svg` (favicon.ico,
 `favicon-32.png`, `apple-touch-icon.png`, manifest icons); after changing the logo
 run `npm run og -- --icons-only`, which needs no dev server.
 
+After regenerating, bump `OG_CARD_VERSION` in `usePageSeo.ts`: messengers cache
+preview images by URL (Telegram even caches a failed fetch), and the `?v=` query
+makes them fetch the new card.
+
 A new project or Lab experiment gets its card from the same run; nothing to
 register. `sitemap.xml` and `robots.txt` are server routes built from the same
 data, so they need no edits either.
