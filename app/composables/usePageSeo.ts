@@ -14,6 +14,13 @@ export interface PageSeoOptions {
  * The origin comes from the request so the same code works on abuki.dev and
  * on localhost; nothing here is hard-coded to a domain.
  */
+/**
+ * Bump after `npm run og` regenerates the cards: messengers cache a preview image
+ * by URL (Telegram even caches a failed fetch), and a new query string makes them
+ * fetch it again.
+ */
+const OG_CARD_VERSION = 2
+
 export const usePageSeo = ({ title, description, type = 'website', card = 'home' }: PageSeoOptions) => {
   const route = useRoute()
   const url = useRequestURL()
@@ -21,7 +28,7 @@ export const usePageSeo = ({ title, description, type = 'website', card = 'home'
   const switchLocalePath = useSwitchLocalePath()
 
   const canonicalUrl = url.origin + route.path
-  const imageUrl = `${url.origin}/og/${card}-${locale.value}.jpg`
+  const imageUrl = `${url.origin}/og/${card}-${locale.value}.jpg?v=${OG_CARD_VERSION}`
 
   const alternateLinks = locales.value.map(entry => ({
     rel: 'alternate',
