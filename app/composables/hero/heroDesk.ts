@@ -1,10 +1,11 @@
 import * as THREE from 'three'
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { heroStack } from '@/data/profile'
 
 /**
- * The hero's "workplace": a bar-height table on one leg, built
- * from primitives so it costs no download and takes the site's colours, and a
- * code screen for the laptop that stands on it. Together they say "programmer"
+ * The hero's "workplace": a bar-height table on one leg and an open laptop on it,
+ * both built from primitives so they cost no download, need no licence credit
+ * and take the site's colours, and the code screen the laptop shows. Together they say "programmer"
  * at a glance, which the avatar alone did not.
  *
  * Sizes are in avatar units: the avatar is 2 units tall, so 1 unit ≈ 0.9 m.
@@ -144,28 +145,52 @@ export function createCodeScreen(): CodeScreen {
   return { texture, update, dispose: () => texture.dispose() }
 }
 
+const ALUMINIUM = '#c8cacd'
+const KEYBOARD = '#2a2a2c'
+
 /**
- * The laptop model's screen quad samples only a window of its original texture
- * (u 0.27–0.71, v 0.23–0.81). Stretch its UVs over the whole square so the code
- * canvas fills the screen edge to edge.
+ * An open, MacBook-like laptop: rounded aluminium base with a dark keyboard well
+ * and a trackpad, and a lid opened a little past upright, its screen showing the
+ * code canvas. Built 1 unit wide, keyboard towards +z, screen facing +z; the
+ * caller scales it. The group's origin is at the centre of the base's underside.
  */
-export function fitScreenUvs(geometry: THREE.BufferGeometry) {
-  const uv = geometry.getAttribute('uv')
-  if (!uv) {
-    return
-  }
-  let minU = Infinity
-  let minV = Infinity
-  let maxU = -Infinity
-  let maxV = -Infinity
-  for (let index = 0; index < uv.count; index++) {
-    minU = Math.min(minU, uv.getX(index))
-    maxU = Math.max(maxU, uv.getX(index))
-    minV = Math.min(minV, uv.getY(index))
-    maxV = Math.max(maxV, uv.getY(index))
-  }
-  for (let index = 0; index < uv.count; index++) {
-    uv.setXY(index, (uv.getX(index) - minU) / (maxU - minU), (uv.getY(index) - minV) / (maxV - minV))
-  }
-  uv.needsUpdate = true
+export function createLaptop(screenTexture: THREE.Texture): THREE.Group {
+  const laptop = new THREE.Group()
+  const width = 1
+  const depth = 0.7
+  const baseHeight = 0.035
+  const lidThickness = 0.022
+
+  const metal = new THREE.MeshStandardMaterial({ color: ALUMINIUM, roughness: 0.38, metalness: 0.25 })
+  const dark = new THREE.MeshStandardMaterial({ color: KEYBOARD, roughness: 0.7 })
+  const pad = new THREE.MeshStandardMaterial({ color: '#b9bbbf', roughness: 0.3, metalness: 0.2 })
+
+  const base = new THREE.Mesh(new RoundedBoxGeometry(width, baseHeight, depth, 3, 0.012), metal)
+  base.position.y = baseHeight / 2
+
+  // Keyboard well and trackpad: thin slabs just proud of the top face.
+  const keyboard = new THREE.Mesh(new THREE.BoxGeometry(width * 0.86, 0.002, depth * 0.4), dark)
+  keyboard.position.set(0, baseHeight + 0.001, -depth * 0.12)
+  const trackpad = new THREE.Mesh(new THREE.BoxGeometry(width * 0.36, 0.002, depth * 0.26), pad)
+  trackpad.position.set(0, baseHeight + 0.001, depth * 0.3)
+
+  // The lid hinges on the base's back edge and leans back ~15° past upright.
+  const hinge = new THREE.Group()
+  hinge.position.set(0, baseHeight, -depth / 2 + lidThickness / 2)
+  hinge.rotation.x = -0.26
+  const lid = new THREE.Mesh(new RoundedBoxGeometry(width, depth, lidThickness, 3, 0.01), metal)
+  lid.position.y = depth / 2
+  const bezel = new THREE.Mesh(new THREE.PlaneGeometry(width * 0.97, depth * 0.95), new THREE.MeshBasicMaterial({ color: '#111111' }))
+  bezel.position.set(0, depth / 2, lidThickness / 2 + 0.0006)
+  // The screen keeps the code canvas's 1.48:1 and glows (unlit, no tone mapping).
+  const screenWidth = width * 0.9
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(screenWidth, screenWidth / 1.48),
+    new THREE.MeshBasicMaterial({ map: screenTexture, toneMapped: false }),
+  )
+  screen.position.set(0, depth / 2 + depth * 0.02, lidThickness / 2 + 0.0012)
+  hinge.add(lid, bezel, screen)
+
+  laptop.add(base, keyboard, trackpad, hinge)
+  return laptop
 }

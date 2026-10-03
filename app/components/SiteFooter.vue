@@ -4,15 +4,7 @@
       class="page flex flex-col gap-4 text-sm text-ink-mute sm:flex-row sm:items-center sm:justify-between"
       :class="compact ? 'py-3' : 'py-8'"
     >
-      <p>
-        © {{ year }} Alex Buki. Built with Nuxt and Three.js.
-        <a
-          href="https://sketchfab.com/3d-models/macbook-laptop-7ceb46a1425b475fa7f6bf192e01ed74"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="transition-colors hover:text-ink"
-        >Laptop model by Issac Ghazanfar, CC BY 4.0.</a>
-      </p>
+      <p>© {{ year }} Alex Buki. Built with Nuxt and Three.js.</p>
       <ul v-if="!route.meta.hasContactSection" class="flex-wrap gap-x-6 gap-y-2" :class="compact ? 'hidden sm:flex' : 'flex'">
         <li><a :href="contacts.telegram" data-goal="contact" data-goal-channel="telegram" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">Telegram</a></li>
         <li><a :href="`mailto:${contacts.email}`" data-goal="contact" data-goal-channel="email" class="transition-colors hover:text-ink">{{ $t('contact.email') }}</a></li>
@@ -36,7 +28,6 @@ const { compact = false } = defineProps<{ compact?: boolean }>()
 // there the same four links sit right above, so the footer leaves them out.
 const route = useRoute()
 
-// The sign-off stays in English on both locales, like the brand name. The laptop
-// credit is required by the model's CC BY 4.0 licence wherever it is shown.
+// The sign-off stays in English on both locales, like the brand name.
 const year = new Date().getFullYear()
 </script>

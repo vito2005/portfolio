@@ -17,7 +17,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { useLabScene } from '@/composables/lab/useLabScene'
-import { type CodeScreen, createBarTable, createCodeScreen, fitScreenUvs, TABLE_TOP_Y } from '@/composables/hero/heroDesk'
+import { type CodeScreen, createBarTable, createCodeScreen, createLaptop, TABLE_TOP_Y } from '@/composables/hero/heroDesk'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -47,6 +47,7 @@ const DESK_LAYOUT = {
   laptopWidth: 0.48,
 }
 let detachTouch: (() => void) | null = null
+
 
 // iOS Safari can still turn a long horizontal swipe that drifts up or down into a page
 // scroll, despite pan-y. So the direction is decided once per swipe, the way the browser
@@ -159,37 +160,13 @@ onMounted(() => {
       table.position.copy(DESK_LAYOUT.position)
       scene.add(table)
       desk = table
-      try {
-        // "MacBook Laptop" by Issac Ghazanfar, CC BY 4.0 (credited in the footer).
-        const laptop = (await loader.loadAsync('/models/laptop.glb')).scene
-        // The model sits far from its origin and in odd units: centre it, stand it on
-        // its base and scale it by width.
-        const laptopBounds = new THREE.Box3().setFromObject(laptop)
-        const laptopSize = laptopBounds.getSize(new THREE.Vector3())
-        const laptopCenter = laptopBounds.getCenter(new THREE.Vector3())
-        laptop.position.set(-laptopCenter.x, -laptopBounds.min.y, -laptopCenter.z)
-        const laptopHolder = new THREE.Group()
-        laptopHolder.add(laptop)
-        laptopHolder.scale.setScalar(DESK_LAYOUT.laptopWidth / laptopSize.x)
-        laptopHolder.position.y = TABLE_TOP_Y
-        laptopHolder.rotation.y = DESK_LAYOUT.laptopYaw
-        table.add(laptopHolder)
-
-        // The screen is its own quad: swap its picture for the typing editor, unlit so it glows.
-        codeScreen = createCodeScreen()
-        laptop.traverse((child) => {
-          if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial && child.material.name === 'Material.003') {
-            fitScreenUvs(child.geometry)
-            child.material.map?.dispose()
-            child.material.dispose()
-            child.material = new THREE.MeshBasicMaterial({ map: codeScreen!.texture, toneMapped: false })
-          }
-        })
-      }
-      catch (error) {
-        // The avatar still works without its desk props.
-        console.error('Laptop model failed to load:', error)
-      }
+      // The laptop types the hero stack on its screen.
+      codeScreen = createCodeScreen()
+      const laptop = createLaptop(codeScreen.texture)
+      laptop.scale.setScalar(DESK_LAYOUT.laptopWidth)
+      laptop.position.y = TABLE_TOP_Y
+      laptop.rotation.y = DESK_LAYOUT.laptopYaw
+      table.add(laptop)
 
       // Frame the whole character: distance from its height and the lens.
       // The desk is part of the shot, so the frame covers both.
