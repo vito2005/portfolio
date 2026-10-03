@@ -17,7 +17,7 @@ export const experience: ExperienceEntry[] = [
   {
     company: 'POW',
     url: 'https://proofofwork.studio',
-    location: { en: 'London, remote', ru: 'Лондон, удалённо' },
+    location: { en: 'Design studio, London, remote', ru: 'Дизайн-студия, Лондон, удалённо' },
     role: { en: 'Senior frontend engineer', ru: 'Ведущий фронтенд-инженер' },
     period: { en: '2024 - 2025', ru: '2024 - 2025' },
     summary: {
