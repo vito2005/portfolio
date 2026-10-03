@@ -1,6 +1,6 @@
 /**
  * Builds the Open Graph cards (1200×630 JPEG) for every page into `public/og/`,
- * plus `public/apple-touch-icon.png`. Content changes rarely, so the cards are
+ * plus the site icons (favicon.ico, PNG favicons, home-screen and manifest icons). Content changes rarely, so the cards are
  * rendered once by this script and committed, instead of being drawn by the
  * server on each request.
  *
@@ -8,13 +8,14 @@
  *   npm run og                 # light cards, the site's look
  *   OG_THEME=dark npm run og   # the dark set, for a future dark theme
  * BASE_URL overrides the dev server address the avatar is rendered from.
+ *   npm run og -- --icons-only # just the site icons, no dev server needed
  *
  * Messengers (VK, LinkedIn) still skip webp previews, hence JPEG.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { chromium, type Browser } from 'playwright'
+import { chromium, type Browser, type Page } from 'playwright'
 import type { LabExperiment, LocaleCode, Project } from '../../app/data/types.ts'
 import { labExperiments } from '../../app/data/lab.ts'
 import { heroStack } from '../../app/data/profile.ts'
@@ -163,6 +164,53 @@ async function renderAvatar(browser: Browser): Promise<string> {
   return `data:image/png;base64,${best.png.toString('base64')}`
 }
 
+/**
+ * The site icons, all from favicon.svg (the A.B. tile). Browsers that skip SVG
+ * favicons (Safari and Chrome on iOS, in the address-bar suggestions) otherwise
+ * fall back to /favicon.ico and show a stray letter. Home-screen and manifest
+ * icons are full-bleed: the platforms round the corners themselves.
+ */
+async function renderIcons(tab: Page) {
+  const svg = await dataUrl('/favicon.svg')
+  async function renderPng(size: number, fullBleed: boolean): Promise<Buffer> {
+    await tab.setViewportSize({ width: size, height: size })
+    await tab.setContent(`<body style="margin:0;background:${fullBleed ? '#111111' : 'transparent'}"><img src="${svg}" style="display:block;width:${size}px;height:${size}px"></body>`)
+    return tab.screenshot({ type: 'png', omitBackground: !fullBleed })
+  }
+
+  const icons: Array<[string, number, boolean]> = [
+    ['favicon-32.png', 32, false],
+    ['apple-touch-icon.png', 180, true],
+    ['icon-192.png', 192, true],
+    ['icon-512.png', 512, true],
+  ]
+  for (const [file, size, fullBleed] of icons) {
+    await writeFile(join(ROOT, 'public', file), await renderPng(size, fullBleed))
+    console.log(file)
+  }
+
+  // favicon.ico: an ICO container around 32 and 48 px PNGs (PNG-in-ICO is fine everywhere since Vista).
+  const images = [await renderPng(32, false), await renderPng(48, false)]
+  const header = Buffer.alloc(6 + 16 * images.length)
+  header.writeUInt16LE(0, 0)
+  header.writeUInt16LE(1, 2)
+  header.writeUInt16LE(images.length, 4)
+  let offset = header.length
+  images.forEach((image, index) => {
+    const size = index === 0 ? 32 : 48
+    const entry = 6 + 16 * index
+    header.writeUInt8(size, entry)
+    header.writeUInt8(size, entry + 1)
+    header.writeUInt16LE(1, entry + 4)
+    header.writeUInt16LE(32, entry + 6)
+    header.writeUInt32LE(image.length, entry + 8)
+    header.writeUInt32LE(offset, entry + 12)
+    offset += image.length
+  })
+  await writeFile(join(ROOT, 'public/favicon.ico'), Buffer.concat([header, ...images]))
+  console.log('favicon.ico')
+}
+
 async function main() {
   const browser = await chromium.launch()
   const context = await browser.newContext({ viewport: { width: 1200, height: 630 } })
@@ -174,6 +222,13 @@ async function main() {
     await mkdir(dirname(join(OUT, file)), { recursive: true })
     await tab.screenshot({ path: join(OUT, file), type: 'jpeg', quality: 88 })
     console.log('og/' + file)
+  }
+
+  // `npm run og -- --icons-only` skips the cards (and the dev server they need).
+  if (process.argv.includes('--icons-only')) {
+    await renderIcons(tab)
+    await browser.close()
+    return
   }
 
   const avatar = await renderAvatar(browser)
@@ -225,11 +280,7 @@ async function main() {
     }
   }
 
-  // iOS home-screen icon: the favicon tile, full-bleed (iOS rounds the corners itself).
-  await tab.setViewportSize({ width: 180, height: 180 })
-  await tab.setContent(`<body style="margin:0;background:#111111"><img src="${await dataUrl('/favicon.svg')}" style="display:block;width:180px;height:180px"></body>`)
-  await writeFile(join(ROOT, 'public/apple-touch-icon.png'), await tab.screenshot({ type: 'png' }))
-  console.log('apple-touch-icon.png')
+  await renderIcons(tab)
 
   await browser.close()
 }

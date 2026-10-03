@@ -177,6 +177,10 @@ npm run og                 # the light set, the site's look
 OG_THEME=dark npm run og   # the dark set
 ```
 
+The same script makes the site icons from `public/favicon.svg` (favicon.ico,
+`favicon-32.png`, `apple-touch-icon.png`, manifest icons); after changing the logo
+run `npm run og -- --icons-only`, which needs no dev server.
+
 A new project or Lab experiment gets its card from the same run; nothing to
 register. `sitemap.xml` and `robots.txt` are server routes built from the same
 data, so they need no edits either.
