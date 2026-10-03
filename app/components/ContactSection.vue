@@ -6,6 +6,8 @@
       <li v-for="item in items" :key="item.href">
         <a
           :href="item.href"
+          data-goal="contact"
+          :data-goal-channel="item.channel"
           :target="item.external ? '_blank' : undefined"
           :rel="item.external ? 'noopener noreferrer' : undefined"
           :aria-label="`${item.label}: ${item.value}`"
@@ -61,9 +63,9 @@ const ICONS = {
 const ICON_COPIES = ['out', 'in'] as const
 
 const items = computed(() => [
-  { label: t('contact.telegram'), value: contacts.telegramHandle, href: contacts.telegram, external: true, icon: ICONS.telegram },
-  { label: t('contact.email'), value: contacts.email, href: `mailto:${contacts.email}`, external: false, icon: ICONS.email },
-  { label: t('contact.linkedin'), value: 'aleksandr-buki', href: contacts.linkedin, external: true, icon: ICONS.linkedin },
-  { label: t('contact.github'), value: contacts.githubHandle, href: contacts.github, external: true, icon: ICONS.github },
+  { channel: 'telegram', label: t('contact.telegram'), value: contacts.telegramHandle, href: contacts.telegram, external: true, icon: ICONS.telegram },
+  { channel: 'email', label: t('contact.email'), value: contacts.email, href: `mailto:${contacts.email}`, external: false, icon: ICONS.email },
+  { channel: 'linkedin', label: t('contact.linkedin'), value: 'aleksandr-buki', href: contacts.linkedin, external: true, icon: ICONS.linkedin },
+  { channel: 'github', label: t('contact.github'), value: contacts.githubHandle, href: contacts.github, external: true, icon: ICONS.github },
 ])
 </script>

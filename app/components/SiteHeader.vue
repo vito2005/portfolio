@@ -18,6 +18,8 @@
         </ul>
         <NuxtLink
           :to="switchLocalePath(otherLocale)"
+          data-goal="locale"
+          :data-goal-to="otherLocale"
           class="rounded-md border border-line px-2 py-1 text-xs font-medium uppercase text-ink-soft transition-colors hover:border-ink hover:text-ink"
           :aria-label="$t('nav.switch_locale')"
           :title="$t('nav.switch_locale')"

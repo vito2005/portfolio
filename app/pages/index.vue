@@ -13,8 +13,8 @@
           </template>
         </i18n-t>
         <div class="rise rise-delay mt-8 flex flex-wrap gap-3">
-          <NuxtLink :to="localePath('/projects')" class="btn">{{ $t('hero.cta_projects') }}</NuxtLink>
-          <a href="#contact" class="btn-outline">{{ $t('hero.cta_contact') }}</a>
+          <NuxtLink :to="localePath('/projects')" class="btn" data-goal="cta" data-goal-target="projects">{{ $t('hero.cta_projects') }}</NuxtLink>
+          <a href="#contact" class="btn-outline" data-goal="cta" data-goal-target="contact">{{ $t('hero.cta_contact') }}</a>
         </div>
         <ul class="rise rise-delay mt-10 flex flex-wrap gap-2" :aria-label="$t('hero.stack_label')">
           <li v-for="tech in heroStack" :key="tech">
@@ -64,7 +64,7 @@
             :key="experiment.slug"
             :class="isLabSliderActive ? 'keen-slider__slide !overflow-visible' : 'w-64 flex-none snap-start sm:w-auto'"
           >
-            <NuxtLink :to="localePath(labExperimentPath(experiment))" class="group block">
+            <NuxtLink :to="localePath(labExperimentPath(experiment))" class="group block" data-goal="lab_open" :data-goal-slug="experiment.slug">
               <PreviewMedia
                 :src="labExperimentImage(experiment)"
                 :alt="pick(experiment.title)"

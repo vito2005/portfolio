@@ -51,7 +51,7 @@
           <h2 class="text-sm font-medium text-ink-mute">{{ $t('projects.links') }}</h2>
           <ul class="mt-3 space-y-2">
             <li v-for="item in project.links" :key="item.href">
-              <a :href="item.href" target="_blank" rel="noopener noreferrer" class="link text-ink">{{ pick(item.label) }}</a>
+              <a :href="item.href" target="_blank" rel="noopener noreferrer" class="link text-ink" data-goal="project_link" :data-goal-slug="project.slug">{{ pick(item.label) }}</a>
             </li>
           </ul>
         </div>

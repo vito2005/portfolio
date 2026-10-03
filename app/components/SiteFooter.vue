@@ -14,10 +14,10 @@
         >Laptop model by Issac Ghazanfar, CC BY 4.0.</a>
       </p>
       <ul v-if="!route.meta.hasContactSection" class="flex-wrap gap-x-6 gap-y-2" :class="compact ? 'hidden sm:flex' : 'flex'">
-        <li><a :href="contacts.telegram" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">Telegram</a></li>
-        <li><a :href="`mailto:${contacts.email}`" class="transition-colors hover:text-ink">{{ $t('contact.email') }}</a></li>
-        <li><a :href="contacts.linkedin" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">LinkedIn</a></li>
-        <li><a :href="contacts.github" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">GitHub</a></li>
+        <li><a :href="contacts.telegram" data-goal="contact" data-goal-channel="telegram" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">Telegram</a></li>
+        <li><a :href="`mailto:${contacts.email}`" data-goal="contact" data-goal-channel="email" class="transition-colors hover:text-ink">{{ $t('contact.email') }}</a></li>
+        <li><a :href="contacts.linkedin" data-goal="contact" data-goal-channel="linkedin" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">LinkedIn</a></li>
+        <li><a :href="contacts.github" data-goal="contact" data-goal-channel="github" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">GitHub</a></li>
       </ul>
     </div>
   </footer>

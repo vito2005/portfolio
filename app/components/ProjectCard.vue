@@ -1,6 +1,8 @@
 <template>
   <NuxtLink
     :to="localePath(`/projects/${project.slug}`)"
+    data-goal="project_open"
+    :data-goal-slug="project.slug"
     class="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-colors hover:border-ink-mute"
   >
     <PreviewMedia

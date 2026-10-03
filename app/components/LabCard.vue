@@ -1,6 +1,8 @@
 <template>
   <NuxtLink
     :to="localePath(labExperimentPath(experiment))"
+    data-goal="lab_open"
+    :data-goal-slug="experiment.slug"
     class="group block overflow-hidden rounded-xl border border-line bg-surface transition-colors hover:border-ink-mute"
   >
     <PreviewMedia
