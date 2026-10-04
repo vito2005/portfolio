@@ -20,6 +20,7 @@ export default defineEventHandler((event) => {
     ...projects.map(project => `/projects/${project.slug}`),
     '/lab',
     ...labExperiments.map(experiment => `/lab/${experiment.slug}`),
+    '/privacy',
   ]
   const href = (path: string, prefix: string) => origin + (path === '/' ? prefix || '/' : prefix + path)
 

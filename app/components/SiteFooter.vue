@@ -4,7 +4,10 @@
       class="page flex flex-col gap-4 text-sm text-ink-mute sm:flex-row sm:items-center sm:justify-between"
       :class="compact ? 'py-3' : 'py-8'"
     >
-      <p>© {{ year }} Alex Buki. Built with Nuxt and Three.js.</p>
+      <p>
+        © {{ year }} Alex Buki. Built with Nuxt and Three.js.
+        <NuxtLink :to="localePath('/privacy')" class="ml-2 underline-offset-4 transition-colors hover:text-ink hover:underline">{{ $t('legal.privacy') }}</NuxtLink>
+      </p>
       <ul v-if="!route.meta.hasContactSection" class="flex-wrap gap-x-6 gap-y-2" :class="compact ? 'hidden sm:flex' : 'flex'">
         <li><a :href="contacts.telegram" data-goal="contact" data-goal-channel="telegram" target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-ink">Telegram</a></li>
         <li><a :href="`mailto:${contacts.email}`" data-goal="contact" data-goal-channel="email" class="transition-colors hover:text-ink">{{ $t('contact.email') }}</a></li>
@@ -27,6 +30,7 @@ const { compact = false } = defineProps<{ compact?: boolean }>()
 // Pages that end with ContactSection set `hasContactSection` in their page meta;
 // there the same four links sit right above, so the footer leaves them out.
 const route = useRoute()
+const localePath = useLocalePath()
 
 // The sign-off stays in English on both locales, like the brand name.
 const year = new Date().getFullYear()

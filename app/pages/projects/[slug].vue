@@ -73,7 +73,6 @@ if (!project) {
   throw createError({ statusCode: 404, statusMessage: t('projects.not_found') })
 }
 
-
 const blocks = computed(() => [
   { title: t('projects.problem'), text: pick(project.problem) },
   { title: t('projects.work_done'), text: pick(project.work) },

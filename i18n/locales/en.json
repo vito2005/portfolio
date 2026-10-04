@@ -68,5 +68,13 @@
   "seo": {
     "name": "Alex Buki",
     "home_title": "Alex Buki — Software Engineer"
+  },
+  "legal": {
+    "privacy": "Privacy",
+    "privacy_title": "Privacy policy",
+    "privacy_updated": "Updated {date}",
+    "cookie_text": "This site uses cookies and Yandex Metrica to see what visitors find useful.",
+    "cookie_more": "Details",
+    "cookie_ok": "Got it"
   }
 }

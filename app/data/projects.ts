@@ -32,7 +32,7 @@ export const projects: Project[] = [
       ru: 'Работает и принимает брони. Отличные Core Web Vitals на мобильных, откуда приходит большинство гостей.',
     },
     stack: ['Nuxt', 'TypeScript', 'Pinia', 'SSR', 'i18n', 'Storybook', 'Playwright', 'Vitest', 'Datadog RUM'],
-    links: [{ label: { en: 'Live site', ru: 'Сайт' }, href: 'https://booking.seabreeze.az' }],
+    links: [{ label: { en: 'booking.seabreeze.az', ru: 'booking.seabreeze.az' }, href: 'https://booking.seabreeze.az' }],
     cover: { en: '/images/projects/sea-breeze-en.webp', ru: '/images/projects/sea-breeze-ru.webp' },
     coverAlt: { en: 'Sea Breeze Booking home page with the search form', ru: 'Главная Sea Breeze Booking с формой поиска' },
   },
@@ -42,7 +42,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: true,
     company: 'POW, London',
-    period: { en: '2024 - 2025', ru: '2024 - 2025' },
+    period: { en: '2024–2025', ru: '2024–2025' },
     role: { en: 'Lead frontend engineer', ru: 'Ведущий фронтенд-инженер' },
     tagline: {
       en: 'Led the front end of a decentralized AI ecosystem: an AI chat, an AI trading agent and a platform for node owners.',
@@ -75,7 +75,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: true,
     company: 'POW, London',
-    period: { en: '2024 - 2025', ru: '2024 - 2025' },
+    period: { en: '2024–2025', ru: '2024–2025' },
     role: { en: 'Frontend engineer, 3D', ru: 'Фронтенд-инженер, 3D' },
     tagline: {
       en: 'Interactive Three.js scenes for the hemi.xyz site, built from Blender models and kept smooth on mid-range phones.',
@@ -108,7 +108,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: true,
     company: 'VK',
-    period: { en: '2020 - 2022', ru: '2020 - 2022' },
+    period: { en: '2020–2022', ru: '2020–2022' },
     role: { en: 'Frontend engineer', ru: 'Фронтенд-инженер' },
     tagline: {
       en: 'Performance-critical UI on one of the most visited pages in Russia, with a Playwright regression system in the release pipeline.',
@@ -137,7 +137,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: false,
     company: 'Metamap, San Francisco',
-    period: { en: '2022 - 2024', ru: '2022 - 2024' },
+    period: { en: '2022–2024', ru: '2022–2024' },
     role: { en: 'Full-stack engineer, Node.js', ru: 'Фулстек-инженер, Node.js' },
     tagline: {
       en: 'Microservices for a fintech underwriting platform used by 35 banks in Latin America.',
@@ -183,7 +183,7 @@ export const projects: Project[] = [
       ru: 'Без большого релиза и без заморозки продукта. Платформа продолжила расти на новой основе.',
     },
     stack: ['Next.js', 'React', 'TypeScript', 'PHP', 'Nginx'],
-    links: [{ label: { en: 'Live site', ru: 'Сайт' }, href: 'https://strikerstat.com' }],
+    links: [{ label: { en: 'strikerstat.com', ru: 'strikerstat.com' }, href: 'https://strikerstat.com' }],
     cover: { en: '/images/projects/strikerstat-en.webp', ru: '/images/projects/strikerstat-ru.webp' },
     coverAlt: { en: 'Strikerstat home page', ru: 'Главная Strikerstat' },
   },
@@ -212,7 +212,7 @@ export const projects: Project[] = [
     },
     stack: ['Bun', 'Telegraf', 'SvelteKit', 'Svelte 5', 'Supabase', 'OpenAI', 'GitHub Actions'],
     links: [
-      { label: { en: 'Live', ru: 'Сайт' }, href: 'https://orbit.abuki.dev' },
+      { label: { en: 'orbit.abuki.dev', ru: 'orbit.abuki.dev' }, href: 'https://orbit.abuki.dev' },
       { label: { en: 'Source on GitHub', ru: 'Код на GitHub' }, href: 'https://github.com/vito2005/orbit' },
     ],
     cover: { en: '/images/projects/orbit.webp', ru: '/images/projects/orbit.webp' },
