@@ -28,6 +28,11 @@ export const usePageSeo = ({ title, description, type = 'website', card = 'home'
   const switchLocalePath = useSwitchLocalePath()
 
   const canonicalUrl = url.origin + route.path
+  // og:url keeps the query string. Telegram files a preview under og:url, so a
+  // shared link like /?utm_source=telegram gets its own preview entry instead of
+  // reusing the one for the bare URL (which Telegram can keep stuck on an old
+  // failed fetch). Search engines still get the clean address via rel=canonical.
+  const shareUrl = url.origin + route.fullPath.split('#')[0]
   const imageUrl = `${url.origin}/og/${card}-${locale.value}.jpg?v=${OG_CARD_VERSION}`
 
   const alternateLinks = locales.value.map(entry => ({
@@ -44,7 +49,7 @@ export const usePageSeo = ({ title, description, type = 'website', card = 'home'
       { property: 'og:type', content: type },
       { property: 'og:title', content: title },
       { property: 'og:description', content: description },
-      { property: 'og:url', content: canonicalUrl },
+      { property: 'og:url', content: shareUrl },
       { property: 'og:image', content: imageUrl },
       // Size up front, so messengers lay out the large preview before fetching the image.
       { property: 'og:image:width', content: '1200' },
