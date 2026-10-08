@@ -34,15 +34,7 @@
           <NuxtLink :to="localePath('/projects')" class="link text-ink">{{ $t('home.projects_all') }}</NuxtLink>
         </template>
       </SectionTitle>
-      <!-- Four cards in two uneven rows (7/5 then 5/7) so the grid has a rhythm instead of four equal boxes. -->
-      <div class="mt-10 grid gap-6 md:grid-cols-12">
-        <ProjectCard
-          v-for="(project, index) in featured"
-          :key="project.slug"
-          :project="project"
-          :class="index % 4 === 0 || index % 4 === 3 ? 'md:col-span-7' : 'md:col-span-5'"
-        />
-      </div>
+      <ProjectClothesline :projects="featured" class="mt-8" />
     </section>
 
     <section class="border-t border-line py-16 sm:py-24">

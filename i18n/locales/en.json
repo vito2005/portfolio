@@ -23,6 +23,7 @@
   "home": {
     "projects_title": "Selected projects",
     "projects_all": "All projects",
+    "projects_drag_hint": "Drag the line to browse",
     "about_title": "About",
     "experience_title": "Where I have worked",
     "cv_download": "CV",

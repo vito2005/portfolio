@@ -23,6 +23,7 @@
   "home": {
     "projects_title": "Избранные проекты",
     "projects_all": "Все проекты",
+    "projects_drag_hint": "Потяните верёвку, чтобы полистать",
     "about_title": "Обо мне",
     "experience_title": "Где я работал",
     "cv_download": "Резюме",
