@@ -14,18 +14,18 @@ export const projects: Project[] = [
     featured: true,
     company: 'Vide Infra',
     period: { en: '2026', ru: '2026' },
-    role: { en: 'Lead frontend engineer', ru: 'Ведущий фронтенд-инженер' },
+    role: { en: 'Senior frontend engineer', ru: 'Ведущий фронтенд-инженер' },
     tagline: {
-      en: 'Direct booking platform for a resort city near Baku, built in about three months, mostly solo.',
-      ru: 'Платформа прямого бронирования для курортного города под Баку, собрана примерно за три месяца, в основном в одиночку.',
+      en: 'Direct booking platform for a resort city near Baku: 3.5 months from first commit to production.',
+      ru: 'Платформа прямого бронирования для курортного города под Баку: 3,5 месяца от первого коммита до продакшена.',
     },
     problem: {
-      en: 'Sea Breeze, a resort city near Baku, needed to take bookings for apartments, hotels and villas directly instead of through aggregators: search by dates and guests, room selection, checkout with online payment, all in Azerbaijani.',
-      ru: 'Курортному городу Sea Breeze под Баку нужно было принимать брони на квартиры, отели и виллы напрямую, а не через агрегаторы: поиск по датам и гостям, выбор номера, оформление с онлайн-оплатой, всё на азербайджанском.',
+      en: 'Sea Breeze, a resort city near Baku, needed to take bookings for apartments, hotels and villas directly instead of through aggregators: search by dates and guests, room selection, checkout with online payment, in Azerbaijani, English and Russian.',
+      ru: 'Курортному городу Sea Breeze под Баку нужно было принимать брони на квартиры, отели и виллы напрямую, а не через агрегаторы: поиск по датам и гостям, выбор номера, оформление с онлайн-оплатой, на азербайджанском, английском и русском.',
     },
     work: {
-      en: 'Built the front end at Vide Infra: architecture, the whole booking funnel from search to payment, integration with the client\'s backend, SSR with server-side caching, and a Storybook-driven component library. Added Playwright smoke tests over the funnel and axe accessibility checks, and pushed product analytics into the roadmap. One frontend engineer helped with parts of the UI.',
-      ru: 'Собрал фронтенд в Vide Infra: архитектура, вся воронка бронирования от поиска до оплаты, интеграция с бэкендом клиента, SSR с серверным кешем, библиотека компонентов в Storybook. Добавил smoke-тесты воронки на Playwright и проверки доступности axe, продвинул продуктовую аналитику в план работ. Один фронтендер помогал с частью интерфейса.',
+      en: 'Built the front end at Vide Infra: architecture, the whole booking funnel from search to payment, integration with the client\'s backend, SSR with server-side caching, and a Storybook-driven component library. Added Playwright smoke tests over the funnel and axe accessibility checks, and pushed product analytics into the roadmap. Two sites, .az and .ru, come from one codebase. Cut the GitLab CI pipeline from about 11 to 3 minutes and npm audit findings from 35 to 0; 450+ commits, the most on the team. One frontend engineer helped with parts of the UI.',
+      ru: 'Собрал фронтенд в Vide Infra: архитектура, вся воронка бронирования от поиска до оплаты, интеграция с бэкендом клиента, SSR с серверным кешем, библиотека компонентов в Storybook. Добавил smoke-тесты воронки на Playwright и проверки доступности axe, продвинул продуктовую аналитику в план работ. Два сайта, .az и .ru, собираются из одной кодовой базы. Ускорил пайплайн GitLab CI примерно с 11 до 3 минут, уязвимости в npm audit сократил с 35 до 0; 450+ коммитов, больше всех в команде. Один фронтендер помогал с частью интерфейса.',
     },
     result: {
       en: 'Live and taking bookings. Excellent Core Web Vitals on mobile, where most guests book.',
@@ -42,7 +42,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: true,
     company: 'POW, London',
-    period: { en: '2024–2025', ru: '2024–2025' },
+    period: { en: '2024–2026', ru: '2024–2026' },
     role: { en: 'Lead frontend engineer', ru: 'Ведущий фронтенд-инженер' },
     tagline: {
       en: 'Led the front end of a decentralized AI ecosystem: an AI chat, an AI trading agent and a platform for node owners.',
@@ -75,7 +75,7 @@ export const projects: Project[] = [
     kind: 'work',
     featured: true,
     company: 'POW, London',
-    period: { en: '2024–2025', ru: '2024–2025' },
+    period: { en: '2024–2026', ru: '2024–2026' },
     role: { en: 'Frontend engineer, 3D', ru: 'Фронтенд-инженер, 3D' },
     tagline: {
       en: 'Interactive Three.js scenes for the hemi.xyz site, built from Blender models and kept smooth on mid-range phones.',
@@ -123,8 +123,8 @@ export const projects: Project[] = [
       ru: 'Разрабатывал и поддерживал высоконагруженный фронтенд на Svelte и React. Настроил end-to-end регрессионное тестирование на Playwright: запуск на каждом релизе и периодически на проде, с алертами при падении. Деплой через GitLab CI, для мониторинга работоспособности страницы написал разбор логов на Go.',
     },
     result: {
-      en: 'Chrome Excellence award at VK People Awards 2021 for Web Vitals work on the main page.',
-      ru: 'Награда Chrome Excellence на VK People Awards 2021 за работу над Web Vitals главной страницы.',
+      en: 'Chrome Excellence team award at VK People Awards 2021 for Web Vitals work on the main page.',
+      ru: 'Командная награда Chrome Excellence на VK People Awards 2021 за работу над Web Vitals главной страницы.',
     },
     stack: ['Svelte', 'React', 'TypeScript', 'XState', 'Playwright', 'GitLab CI', 'Go'],
     links: [{ label: { en: 'mail.ru', ru: 'mail.ru' }, href: 'https://mail.ru' }],

@@ -1,12 +1,12 @@
 import type { ExperienceEntry } from './types'
 
-/** Employment history, newest first. Years only: months add noise, not trust. */
+/** Employment history, newest first. Years only, unless a month is needed to match the CV and hh. */
 export const experience: ExperienceEntry[] = [
   {
     company: 'Vide Infra',
     url: 'https://videinfra.com',
-    location: { en: 'Design studio, remote', ru: 'Дизайн-студия, удалённо' },
-    role: { en: 'Lead frontend engineer', ru: 'Ведущий фронтенд-инженер' },
+    location: { en: 'Design studio, remote, contract', ru: 'Дизайн-студия, удалённо, контракт' },
+    role: { en: 'Senior full-stack engineer (front-end focus)', ru: 'Ведущий фулстек-инженер, упор на фронтенд' },
     period: { en: '2026 – now', ru: '2026 – сейчас' },
     summary: {
       en: 'Own everything but the backend on Sea Breeze Booking: architecture, the booking funnel, SSR, testing and releases.',
@@ -17,9 +17,9 @@ export const experience: ExperienceEntry[] = [
   {
     company: 'POW',
     url: 'https://proofofwork.studio',
-    location: { en: 'Design studio, London, remote', ru: 'Дизайн-студия, Лондон, удалённо' },
+    location: { en: 'Design studio, London, remote, contract', ru: 'Дизайн-студия, Лондон, удалённо, контракт' },
     role: { en: 'Senior frontend engineer', ru: 'Ведущий фронтенд-инженер' },
-    period: { en: '2024–2025', ru: '2024–2025' },
+    period: { en: 'Aug 2024 – Jan 2026', ru: 'авг 2024 – янв 2026' },
     summary: {
       en: 'Led the front end of the OSMI.AI ecosystem and built Three.js scenes for hemi.xyz.',
       ru: 'Вёл фронтенд экосистемы OSMI.AI и делал Three.js-сцены для hemi.xyz.',
@@ -45,8 +45,8 @@ export const experience: ExperienceEntry[] = [
     role: { en: 'Frontend engineer', ru: 'Фронтенд-инженер' },
     period: { en: '2020–2022', ru: '2020–2022' },
     summary: {
-      en: 'Mail.ru main page and portal navigation: high-load UI, Playwright regression tests in the release pipeline, Chrome Excellence award 2021.',
-      ru: 'Главная Mail.ru и портальная навигация: высоконагруженный UI, регрессионные тесты на Playwright в пайплайне релизов, награда Chrome Excellence 2021.',
+      en: 'Mail.ru main page and portal navigation: high-load UI, Playwright regression tests in the release pipeline, Chrome Excellence team award (VK People Awards 2021).',
+      ru: 'Главная Mail.ru и портальная навигация: высоконагруженный UI, регрессионные тесты на Playwright в пайплайне релизов, командная награда Chrome Excellence (VK People Awards 2021).',
     },
     projectSlug: 'mail-ru',
   },

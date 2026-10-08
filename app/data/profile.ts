@@ -17,8 +17,8 @@ export const aboutIntro: Localized = {
 
 export const aboutFacts: Localized[] = [
   {
-    en: 'Mail.ru main page: performance and Web Vitals, Chrome Excellence award.',
-    ru: 'Главная Mail.ru: производительность и Web Vitals, награда Chrome Excellence.',
+    en: 'Mail.ru main page: performance and Web Vitals, Chrome Excellence team award (VK People Awards 2021).',
+    ru: 'Главная Mail.ru: производительность и Web Vitals, командная награда Chrome Excellence (VK People Awards 2021).',
   },
   {
     en: 'Design studios POW (London) and Vide Infra: products from the first screen to launch, and 3D scenes.',
