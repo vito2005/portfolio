@@ -19,7 +19,7 @@ export interface PageSeoOptions {
  * by URL (Telegram even caches a failed fetch), and a new query string makes them
  * fetch it again.
  */
-const OG_CARD_VERSION = 3
+const OG_CARD_VERSION = 4
 
 export const usePageSeo = ({ title, description, type = 'website', card = 'home' }: PageSeoOptions) => {
   const route = useRoute()

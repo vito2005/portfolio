@@ -45,15 +45,23 @@ export interface Project {
   video?: string
 }
 
+/** Projects a contract entry was done for, grouped by the studio they came through. */
+export interface ExperienceClientGroup {
+  via: string
+  projects: { name: string, projectSlug?: string }[]
+}
+
 export interface ExperienceEntry {
-  company: string
+  /** A company name, or a localized label such as "Contract development". */
+  company: string | Localized
   url?: string
   location: Localized
   role: Localized
   period: Localized
-  summary: Localized
   /** Links the entry to its project page when there is one. */
   projectSlug?: string
+  /** For contract work: the client projects, listed under the role. */
+  clients?: ExperienceClientGroup[]
   /** Before 2020: folded into one summary line instead of a full entry. */
   early?: boolean
 }

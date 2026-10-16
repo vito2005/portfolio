@@ -30,6 +30,8 @@
     "lab_text": "WebGL experiments in Three.js: kinetic type, materials, light and shadow, environment maps. This is where I try ideas out before they reach real projects.",
     "lab_all": "Open the lab",
     "channels": "I also run a channel on {telegram} and {youtube}.",
+    "experience_via": "via {studio}",
+    "experience_and": "and",
     "experience_early": "{years}: full-stack work in product teams, Node and Vue."
   },
   "projects": {
@@ -71,7 +73,7 @@
     "home_title": "Alex Buki — Software Engineer"
   },
   "legal": {
-    "privacy": "Privacy",
+    "privacy": "Privacy policy",
     "privacy_title": "Privacy policy",
     "privacy_updated": "Updated {date}",
     "cookie_text": "This site uses cookies and Yandex Metrica to see what visitors find useful.",

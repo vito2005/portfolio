@@ -14,7 +14,7 @@ export const projects: Project[] = [
     featured: true,
     company: 'Vide Infra',
     period: { en: '2026', ru: '2026' },
-    role: { en: 'Senior frontend engineer', ru: 'Ведущий фронтенд-инженер' },
+    role: { en: 'Senior full-stack engineer', ru: 'Ведущий фулстек-инженер' },
     tagline: {
       en: 'Direct booking platform for a resort city near Baku: 3.5 months from first commit to production.',
       ru: 'Платформа прямого бронирования для курортного города под Баку: 3,5 месяца от первого коммита до продакшена.',
@@ -43,7 +43,7 @@ export const projects: Project[] = [
     featured: true,
     company: 'POW, London',
     period: { en: '2024–2026', ru: '2024–2026' },
-    role: { en: 'Lead frontend engineer', ru: 'Ведущий фронтенд-инженер' },
+    role: { en: 'Senior full-stack engineer', ru: 'Ведущий фулстек-инженер' },
     tagline: {
       en: 'Led the front end of a decentralized AI ecosystem: an AI chat, an AI trading agent and a platform for node owners.',
       ru: 'Вёл фронтенд экосистемы децентрализованного ИИ: ИИ-чат, торговый ИИ-агент и платформа для владельцев нод.',
@@ -76,7 +76,7 @@ export const projects: Project[] = [
     featured: true,
     company: 'POW, London',
     period: { en: '2024–2026', ru: '2024–2026' },
-    role: { en: 'Frontend engineer, 3D', ru: 'Фронтенд-инженер, 3D' },
+    role: { en: 'Senior full-stack engineer, 3D', ru: 'Ведущий фулстек-инженер, 3D' },
     tagline: {
       en: 'Interactive Three.js scenes for the hemi.xyz site, built from Blender models and kept smooth on mid-range phones.',
       ru: 'Интерактивные 3D-сцены на Three.js для сайта hemi.xyz: модели из Blender, плавная работа на обычных телефонах.',
