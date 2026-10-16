@@ -9,6 +9,18 @@ export const contacts = {
   githubHandle: 'vito2005',
 }
 
+/** One-page CV in the visitor's language; the PDFs live in `public/cv/`. */
+export const cvFile: Localized = {
+  en: '/cv/Aleksandr_Buki_CV_EN.pdf',
+  ru: '/cv/Aleksandr_Buki_CV_RU.pdf',
+}
+
+/** First page of the CV as a small image, for the hover preview on the download link. */
+export const cvPreview: Localized = {
+  en: '/cv/Aleksandr_Buki_CV_EN.webp',
+  ru: '/cv/Aleksandr_Buki_CV_RU.webp',
+}
+
 /** About section on the home page: one line on what I do, then three proof points. */
 export const aboutIntro: Localized = {
   en: 'Full-stack with a front-end lean. I build design-led interfaces and take them all the way to production: SSR, tests, CI, monitoring.',

@@ -6,7 +6,7 @@ export const experience: ExperienceEntry[] = [
     company: 'Vide Infra',
     url: 'https://videinfra.com',
     location: { en: 'Design studio, remote, contract', ru: 'Дизайн-студия, удалённо, контракт' },
-    role: { en: 'Senior full-stack engineer (front-end focus)', ru: 'Ведущий фулстек-инженер, упор на фронтенд' },
+    role: { en: 'Senior full-stack engineer', ru: 'Ведущий фулстек-инженер' },
     period: { en: '2026 – now', ru: '2026 – сейчас' },
     summary: {
       en: 'Own everything but the backend on Sea Breeze Booking: architecture, the booking funnel, SSR, testing and releases.',

@@ -34,6 +34,7 @@
         </a>
       </li>
     </ul>
+    <CvLink place="contact" class="mt-6" />
   </section>
 </template>
 

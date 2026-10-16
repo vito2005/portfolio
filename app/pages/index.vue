@@ -99,7 +99,10 @@
         </i18n-t>
       </div>
       <div class="lg:col-span-7">
-        <p class="text-sm font-medium text-ink-mute">{{ $t('home.experience_title') }}</p>
+        <div class="flex items-baseline justify-between gap-4">
+          <p class="text-sm font-medium text-ink-mute">{{ $t('home.experience_title') }}</p>
+          <CvLink place="experience" align="end" />
+        </div>
         <ExperienceList class="mt-5" />
       </div>
     </section>
