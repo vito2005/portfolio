@@ -3,8 +3,17 @@
 @tailwind utilities;
 
 @layer base {
+  /* Wide screens: the root size grows from 16px at 1600px wide to 20px at 2560px, so the
+     rem-based layout (page column, type, spacing) scales up instead of leaving the screen empty. */
   html {
     scroll-behavior: smooth;
+    font-size: clamp(100%, 0.5833rem + 0.4167vw, 125%);
+  }
+
+  /* Page column: 72rem on laptops, 84% of the screen once that is wider (from ~1370px),
+     so sections spread out on big screens instead of sitting in a strip in the middle. */
+  :root {
+    --page-max: max(72rem, 84vw);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -40,7 +49,7 @@
   }
   /* One page width for every route; the lab layout is the exception because the canvas needs the full box. */
   .page {
-    @apply mx-auto w-full max-w-6xl px-6;
+    @apply mx-auto w-full max-w-[var(--page-max)] px-6;
   }
   /* Inline text link: underline offset from the baseline, accent on hover. */
   .link {

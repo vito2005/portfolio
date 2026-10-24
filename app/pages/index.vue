@@ -3,17 +3,17 @@
     <section class="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-12 lg:gap-12">
       <div class="lg:col-span-7">
         <p class="rise text-xs font-medium uppercase tracking-[0.18em] text-accent-ink">{{ $t('hero.eyebrow') }}</p>
-        <h1 class="rise mt-4 font-serif text-[8.6vw] leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem] xl:text-[3.6rem]">
+        <h1 class="rise mt-4 font-serif text-[8.6vw] leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem] xl:text-[3.6rem] min-[1800px]:text-[4.5rem]">
           {{ $t('hero.title') }}
         </h1>
-        <p class="rise rise-delay mt-6 max-w-[40ch] text-lg leading-relaxed text-ink-soft sm:text-xl">{{ $t('hero.subtitle') }}</p>
-        <i18n-t keypath="hero.now" tag="p" class="rise rise-delay mt-3 text-sm text-ink-mute sm:text-base">
+        <p class="rise rise-delay mt-6 max-w-[40ch] text-lg leading-relaxed text-ink-soft sm:text-xl min-[1800px]:text-2xl">{{ $t('hero.subtitle') }}</p>
+        <i18n-t keypath="hero.now" tag="p" class="rise rise-delay mt-3 text-sm text-ink-mute sm:text-base min-[1800px]:text-lg">
           <template #studio>
             <a href="https://videinfra.com" target="_blank" rel="noopener noreferrer" class="link text-ink">Vide Infra</a>
           </template>
         </i18n-t>
         <div class="rise rise-delay mt-8 flex flex-wrap gap-3">
-          <NuxtLink :to="localePath('/projects')" class="btn" data-goal="cta" data-goal-target="projects">{{ $t('hero.cta_projects') }}</NuxtLink>
+          <a href="#projects" class="btn" data-goal="cta" data-goal-target="projects">{{ $t('hero.cta_projects') }}</a>
           <a href="#contact" class="btn-outline" data-goal="cta" data-goal-target="contact">{{ $t('hero.cta_contact') }}</a>
         </div>
         <ul class="rise rise-delay mt-10 flex flex-wrap gap-2" :aria-label="$t('hero.stack_label')">
@@ -27,14 +27,9 @@
       </div>
     </section>
 
-    <section class="border-t border-line py-16 sm:py-24">
-      <SectionTitle>
-        {{ $t('home.projects_title') }}
-        <template #aside>
-          <NuxtLink :to="localePath('/projects')" class="link text-ink">{{ $t('home.projects_all') }}</NuxtLink>
-        </template>
-      </SectionTitle>
-      <ProjectClothesline :projects="featured" class="mt-8" />
+    <section id="projects" class="scroll-mt-20 border-t border-line py-16 sm:py-24">
+      <SectionTitle>{{ $t('home.projects_title') }}</SectionTitle>
+      <ProjectClothesline :projects="projects" class="mt-8" />
     </section>
 
     <section class="border-t border-line py-16 sm:py-24">
@@ -48,7 +43,7 @@
       <div class="-mx-6 mt-10 overflow-hidden sm:mx-0 sm:overflow-visible">
         <ul
           ref="labSliderRef"
-          class="sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10"
+          class="sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 min-[1800px]:grid-cols-4"
           :class="isLabSliderActive ? 'keen-slider mx-6 !w-auto !overflow-visible' : 'flex snap-x gap-4 overflow-x-auto px-6 pb-2 sm:px-0'"
         >
           <li
@@ -106,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { featuredProjects } from '@/data/projects'
+import { projects } from '@/data/projects'
 import { aboutFacts, aboutIntro, channels, heroStack } from '@/data/profile'
 import type { LabExperiment } from '@/data/types'
 import { findLabExperiment, labExperimentImage, labExperimentPath, labExperimentVideo } from '@/data/lab'
@@ -120,10 +115,11 @@ const { t } = useI18n()
 
 // The RU hero title uses a non-breaking hyphen so «Веб‑разработчик» never splits at it;
 // the h1 sizes were measured on the longer «Инженер‑разработчик», so it fits with room.
+// From 1800px the hero type and avatar step up, or they get lost in the wide page column.
 
-const featured = featuredProjects()
 // A hand-picked four for the home page, strongest first; the full list lives on the lab page.
 // From sm up they sit 2×2: in a row of four the clips were ~250px wide and got lost.
+// From 1800px the wide page column fits a row of four at ~370px each.
 const HOME_EXPERIMENT_SLUGS = ['kinetic-text', 'environment-map', 'haunted-house', 'materials']
 
 // Phones: the lab row is a keen-slider (inertia, vertical swipes left to the page, first

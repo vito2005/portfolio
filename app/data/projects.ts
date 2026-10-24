@@ -1,9 +1,9 @@
 import type { Project } from './types'
 
 /**
- * Every project on the site, in display order. `featured` ones make the
- * home page; the rest only appear on `/projects`. Facts here were checked
- * against the CVs and the live sites; keep numbers to ones that can be
+ * Every project on the site, in display order: all of them hang on the home
+ * page clothesline, each with its own `/projects/<slug>` page. Facts here were
+ * checked against the CVs and the live sites; keep numbers to ones that can be
  * backed up.
  */
 export const projects: Project[] = [
@@ -11,7 +11,6 @@ export const projects: Project[] = [
     slug: 'sea-breeze-booking',
     title: 'Sea Breeze Booking',
     kind: 'work',
-    featured: true,
     company: 'Vide Infra',
     period: { en: '2026', ru: '2026' },
     role: { en: 'Senior full-stack engineer', ru: 'Ведущий фулстек-инженер' },
@@ -40,7 +39,6 @@ export const projects: Project[] = [
     slug: 'osmi',
     title: 'osmi.ai',
     kind: 'work',
-    featured: true,
     company: 'POW, London',
     period: { en: '2024–2026', ru: '2024–2026' },
     role: { en: 'Senior full-stack engineer', ru: 'Ведущий фулстек-инженер' },
@@ -73,7 +71,6 @@ export const projects: Project[] = [
     slug: 'hemi',
     title: 'hemi.xyz',
     kind: 'work',
-    featured: true,
     company: 'POW, London',
     period: { en: '2024–2026', ru: '2024–2026' },
     role: { en: 'Senior full-stack engineer, 3D', ru: 'Ведущий фулстек-инженер, 3D' },
@@ -106,7 +103,6 @@ export const projects: Project[] = [
     slug: 'mail-ru',
     title: 'Mail.ru',
     kind: 'work',
-    featured: true,
     company: 'VK',
     period: { en: '2020–2022', ru: '2020–2022' },
     role: { en: 'Frontend engineer', ru: 'Фронтенд-инженер' },
@@ -135,7 +131,6 @@ export const projects: Project[] = [
     slug: 'metamap',
     title: 'Metamap',
     kind: 'work',
-    featured: false,
     company: 'Metamap, San Francisco',
     period: { en: '2022–2024', ru: '2022–2024' },
     role: { en: 'Full-stack engineer, Node.js', ru: 'Фулстек-инженер, Node.js' },
@@ -164,7 +159,6 @@ export const projects: Project[] = [
     slug: 'strikerstat',
     title: 'Strikerstat',
     kind: 'freelance',
-    featured: false,
     role: { en: 'Architect and frontend lead', ru: 'Архитектор и ведущий фронтенд' },
     tagline: {
       en: 'Combat sports platform for competitions, fighters and trainers, moved off a legacy PHP monolith with zero downtime.',
@@ -191,7 +185,6 @@ export const projects: Project[] = [
     slug: 'orbit',
     title: 'Orbit',
     kind: 'side',
-    featured: false,
     period: { en: '2026', ru: '2026' },
     role: { en: 'Everything, from idea to production', ru: 'Всё: от идеи до запуска' },
     tagline: {
@@ -222,8 +215,6 @@ export const projects: Project[] = [
 
 export const findProject = (slug: string): Project | undefined =>
   projects.find(project => project.slug === slug)
-
-export const featuredProjects = (): Project[] => projects.filter(project => project.featured)
 
 /**
  * i18n key for the line where a card shows the company, for projects that have

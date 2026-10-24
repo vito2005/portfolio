@@ -1,6 +1,6 @@
 <template>
   <article class="page py-12 sm:py-16">
-    <NuxtLink :to="localePath('/projects')" class="link text-sm text-ink-soft">{{ $t('projects.back') }}</NuxtLink>
+    <NuxtLink :to="`${localePath('/')}#projects`" class="link text-sm text-ink-soft">{{ $t('projects.back') }}</NuxtLink>
 
     <h1 class="mt-6 font-serif text-4xl tracking-tight text-ink sm:text-5xl">{{ project.title }}</h1>
     <p class="mt-4 max-w-[60ch] text-lg leading-relaxed text-ink-soft">{{ pick(project.tagline) }}</p>

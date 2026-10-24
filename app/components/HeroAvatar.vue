@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="relative mx-auto aspect-square w-full max-w-[420px] overflow-hidden rounded-xl">
+  <div ref="containerRef" class="relative mx-auto aspect-square w-full max-w-[26.25rem] overflow-hidden min-[1800px]:max-w-[34rem] rounded-xl">
     <canvas
       ref="canvasRef"
       class="h-full w-full outline-none transition-opacity duration-700"

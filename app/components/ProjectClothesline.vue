@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="ml-[calc(50%-50vw)] w-screen">
     <div
       ref="rootRef"
-      class="relative -mx-6 select-none overflow-hidden sm:mx-0"
+      class="relative select-none overflow-hidden"
       :class="isReady ? 'touch-pan-y' : ''"
-      :style="isReady ? { height: `${layout.height}px`, cursor: isDragging ? 'grabbing' : 'grab', ...edgeFade } : undefined"
+      :style="isReady ? { height: `${layout.height}px`, marginBottom: `${-SHADOW_OVERLAP}px`, cursor: isDragging ? 'grabbing' : 'grab', ...edgeFade } : undefined"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
       @pointerup="handlePointerUp"
@@ -26,7 +26,7 @@
       </svg>
 
       <ul
-        :class="isReady ? 'absolute inset-0' : 'flex snap-x gap-6 overflow-x-auto px-6 pb-6 pt-8 sm:px-0'"
+        :class="isReady ? 'absolute inset-0' : 'flex snap-x gap-6 overflow-x-auto px-[max(1.5rem,calc((100vw_-_var(--page-max))_/_2_+_1.5rem))] pb-6 pt-8'"
         :aria-label="$t('home.projects_title')"
       >
         <li
@@ -67,10 +67,10 @@
               </p>
             </div>
             <div class="px-1 pb-1.5 pt-3">
-              <p class="font-serif text-xl leading-tight tracking-tight text-ink transition-colors [@media(hover:hover)]:group-hover:text-accent-deep">
+              <p class="-rotate-1 font-hand text-[1.75rem] font-semibold leading-none text-ink transition-colors [@media(hover:hover)]:group-hover:text-accent-deep">
                 {{ slot.project.title }}
               </p>
-              <p class="mt-1 flex justify-between gap-3 text-xs text-ink-mute">
+              <p class="mt-2 flex justify-between gap-3 text-xs text-ink-mute">
                 <span class="truncate">{{ slot.project.company ?? $t(projectOriginKey(slot.project)) }}</span>
                 <span v-if="slot.project.period" class="flex-none">{{ pick(slot.project.period) }}</span>
               </p>
@@ -108,15 +108,18 @@ import {
 } from '@/composables/clothesline/clothesline'
 
 /**
- * The featured projects as photo prints pegged to a rope across the page. The
+ * The projects as photo prints pegged to a rope across the page. The
  * line drifts slowly, can be dragged or thrown sideways and loops forever; each
  * print swings on its peg when the line jerks. Without JS (and during SSR) the
  * same cards render as a plain scrollable row, so links and text are always there.
  *
  * Template notes (kept here: HTML comments in templates have caused hydration
  * mismatches in this project):
+ * - the line bleeds out of the page column to the screen edges (100vw; the layout
+ *   clips the scrollbar's worth of overflow), while the no-JS row starts at the column;
  * - the rope is three strokes: a soft shadow under it, the cord, and a dashed
  *   highlight that reads as braid;
+ * - the project title is written in marker (Caveat), like a caption on a print;
  * - the tagline slides over the photo on hover and keyboard focus, but not on
  *   touch, where hover sticks after a tap;
  * - the clothespin is two jaws in the accent colour with a steel spring.
@@ -135,27 +138,35 @@ const isHovered = ref(false)
 
 /** Container width; 0 until measured on the client. */
 const width = ref(0)
+/** Room under the lowest print; all but 36px of it overlaps the hint below, where the shadow is faint. */
+const SHADOW_ROOM = 100
+const SHADOW_OVERLAP = SHADOW_ROOM - 36
+
+/** Root font size: it grows on wide screens, and the print's border and caption are in rem. */
+const rootFontSize = ref(16)
 
 const layout = computed(() => {
   const containerWidth = width.value
   const isNarrow = containerWidth > 0 && containerWidth < 640
-  // A print is a quarter of the line on desktop and most of the screen on a phone.
+  // A print is a fifth of the screen on desktop (up to 440px on a wide one) and most of it on a phone.
   const cardWidth = containerWidth === 0
     ? 300
-    : Math.round(isNarrow ? Math.min(containerWidth * 0.68, 280) : Math.min(Math.max(containerWidth * 0.24, 240), 320))
-  const gap = isNarrow ? 28 : 44
+    : Math.round(isNarrow ? Math.min(containerWidth * 0.68, 280) : Math.min(Math.max(containerWidth * 0.2, 240), 440))
+  const gap = isNarrow ? 28 : Math.max(44, Math.round(cardWidth * 0.14))
   const step = cardWidth + gap
-  // Photo is 4:3 inside a 10px border, plus the caption strip under it.
-  const cardHeight = 20 + (cardWidth - 20) * 0.75 + 66
-  const sag = Math.round(Math.min(Math.max(containerWidth * 0.035, 22), 52))
+  // Photo is 4:3 inside the print's border (p-2.5), plus the caption strip under it.
+  const border = rootFontSize.value * 0.625
+  const cardHeight = border * 2 + (cardWidth - border * 2) * 0.75 + rootFontSize.value * 4.125
+  const sag = Math.round(Math.min(Math.max(containerWidth * 0.035, 22), 80))
   const top = 34
   return {
     cardWidth,
     step,
     sag,
     top,
-    // Rope, the drop of the lowest print, and room below for its swing and shadow.
-    height: Math.round(top + sag + cardHeight + 36),
+    // Rope, the drop of the lowest print, and room below for its swing and the whole soft shadow
+    // (the hover one reaches ~76px), which the overflow clip would otherwise cut flat.
+    height: Math.round(top + sag + cardHeight + SHADOW_ROOM),
   }
 })
 
@@ -181,7 +192,7 @@ const ropeData = ref('')
 
 /** Fade the line out at both edges so cards dissolve instead of being cut. */
 const edgeFade = computed(() => {
-  const fade = width.value < 640 ? 24 : 72
+  const fade = width.value < 640 ? 24 : Math.round(Math.min(160, width.value * 0.06))
   const mask = `linear-gradient(90deg, transparent 0, #000 ${fade}px, #000 calc(100% - ${fade}px), transparent 100%)`
   return { maskImage: mask, WebkitMaskImage: mask }
 })
@@ -276,6 +287,7 @@ function measure() {
     return
   }
   width.value = element.clientWidth
+  rootFontSize.value = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
   const { top, sag } = layout.value
   rope = createRope({ width: width.value, top, sag })
   ropeData.value = ropePathData(rope, width.value)

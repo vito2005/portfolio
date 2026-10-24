@@ -21,8 +21,7 @@
     "stack_label": "Main technologies"
   },
   "home": {
-    "projects_title": "Selected projects",
-    "projects_all": "All projects",
+    "projects_title": "Projects",
     "projects_drag_hint": "Drag the line to browse",
     "about_title": "About",
     "experience_title": "Where I have worked",
@@ -37,9 +36,6 @@
   },
   "projects": {
     "title": "Projects",
-    "intro": "Products I have led or built, and side projects that became real. Each one lists the problem, what I did and what came out of it.",
-    "work": "Client and company work",
-    "side": "Side projects",
     "problem": "Problem",
     "work_done": "What I did",
     "result": "Result",

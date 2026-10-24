@@ -36,6 +36,8 @@ export default {
       fontFamily: {
         serif: ['"DM Serif Display"', 'Georgia', 'serif'],
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        // Handwriting for the marker captions on the clothesline prints; used sparingly.
+        hand: ['Caveat', '"Comic Sans MS"', 'cursive'],
       },
     },
   },

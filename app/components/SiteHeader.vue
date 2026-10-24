@@ -78,19 +78,21 @@ const switchLocalePath = useSwitchLocalePath()
 const { locale } = useI18n()
 const route = useRoute()
 
-// Projects and Lab are routes; About and Contact are sections of the home page,
-// so they never get the "active" colour (it would light up on the whole home page).
+const routeBaseName = useRouteBaseName()
+
+// Projects, About and Contact are sections of the home page, so they don't light up
+// there (it would be the whole page). `routePrefix` names the pages that do light a link.
 const links = computed(() => [
-  { label: 'nav.projects', to: localePath('/projects'), isSection: false },
-  { label: 'nav.lab', to: localePath('/lab'), isSection: false },
-  { label: 'nav.about', to: `${localePath('/')}#about`, isSection: true },
-  { label: 'nav.contact', to: `${localePath('/')}#contact`, isSection: true },
+  { label: 'nav.projects', to: `${localePath('/')}#projects`, routePrefix: 'projects' },
+  { label: 'nav.lab', to: localePath('/lab'), routePrefix: 'lab' },
+  { label: 'nav.about', to: `${localePath('/')}#about` },
+  { label: 'nav.contact', to: `${localePath('/')}#contact` },
 ])
 
-// A section lights up on its own pages too: Lab on every experiment, Projects on every
-// case study. Those are sibling routes, so the router's active class misses them.
-function isCurrent(item: { to: string, isSection: boolean }) {
-  return !item.isSection && route.path.startsWith(item.to)
+// A link lights up on every page under it: Lab on each experiment, Projects on each case
+// study. Matched by the locale-free route name, since `/projects` itself is no longer a page.
+function isCurrent(item: { routePrefix?: string }) {
+  return item.routePrefix !== undefined && (routeBaseName(route) ?? '').startsWith(item.routePrefix)
 }
 
 // Two locales only, so the switch is a single toggle rather than a menu.

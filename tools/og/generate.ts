@@ -238,15 +238,6 @@ async function main() {
     const t = messages[locale]
     await shoot(homeCard(locale, avatar), `home-${locale}.jpg`)
 
-    const featured = projects.find(project => project.featured)!
-    await shoot(contentCard({
-      eyebrow: t.seo!.name!,
-      title: t.projects!.title!,
-      text: t.projects!.intro!,
-      image: await dataUrl(pick(featured.cover, locale)),
-      imageRatio: 0.5,
-    }), `projects-${locale}.jpg`)
-
     await shoot(contentCard({
       eyebrow: t.seo!.name!,
       title: t.lab!.title!,

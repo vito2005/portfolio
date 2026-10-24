@@ -35,7 +35,7 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/site.webmanifest' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Caveat:wght@500;600&display=swap' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons' },
       ],
       script: YANDEX_METRIKA_ID
@@ -73,6 +73,9 @@ export default defineNuxtConfig({
     // The About page became a section of the home page; keep shared links working.
     '/about': { redirect: { to: '/#about', statusCode: 301 } },
     '/ru/about': { redirect: { to: '/ru#about', statusCode: 301 } },
+    // Same for the project list, now the clothesline on the home page.
+    '/projects': { redirect: { to: '/#projects', statusCode: 301 } },
+    '/ru/projects': { redirect: { to: '/ru#projects', statusCode: 301 } },
     // The Lab used to live at /lessons/<course exercise number>-<slug>.
     ...labRedirects(),
   },

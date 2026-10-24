@@ -16,7 +16,6 @@ export default defineEventHandler((event) => {
   const origin = getRequestURL(event, { xForwardedHost: true, xForwardedProto: true }).origin
   const paths = [
     '/',
-    '/projects',
     ...projects.map(project => `/projects/${project.slug}`),
     '/lab',
     ...labExperiments.map(experiment => `/lab/${experiment.slug}`),

@@ -20,8 +20,6 @@ export interface Project {
   title: string
   /** `freelance`: built for a client outside a company (no `company` to show). */
   kind: 'work' | 'freelance' | 'side'
-  /** Featured projects appear on the home page; all projects appear on `/projects`. */
-  featured: boolean
   company?: string
   period?: Localized
   role: Localized
